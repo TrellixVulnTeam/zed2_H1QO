@@ -1,0 +1,142 @@
+■git
+sudo apt-get install git
+sudo apt install python3-pip
+
+★cuda 
+ubuntu 20.04
+======================================================================
+CUDA Toolkit 11.0 Downloads
+^^^^^
+https://developer.nvidia.com/cuda-11.0-download-archive?target_os=Linux&target_arch=x86_64&target_distro=Ubuntu&target_version=2004&target_type=deblocal
+------------------------------------------
+■CUDA Toolkit 11.0インストールコマンド
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
+sudo mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
+wget http://developer.download.nvidia.com/compute/cuda/11.0.2/local_installers/cuda-repo-ubuntu2004-11-0-local_11.0.2-450.51.05-1_amd64.deb
+sudo dpkg -i cuda-repo-ubuntu2004-11-0-local_11.0.2-450.51.05-1_amd64.deb
+sudo apt-key add /var/cuda-repo-ubuntu2004-11-0-local/7fa2af80.pub
+sudo apt-get update
+sudo apt-get -y install cuda-11.0
+
+---------------------------------------------------
+ZED SDK for Ubuntu 20.04
+■ZED_SDK_Ubuntu20_cuda11のインストール
+https://www.stereolabs.com/developers/release/
+●インストールコマンド
+chmod +x ZED_SDK_Ubuntu20_cuda11.0_v3.2.2.run
+./ZED_SDK_Ubuntu20_cuda11.0_v3.2.2.run 
+
+------------------------------------------
+★uninstall cuda
+---------
+sudo apt-get autoremove --purge cuda 
+sudo apt-get purge nvidia*
+sudo apt-get autoremove
+sudo apt-get autoclean
+sudo rm -rf /usr/local/cuda*
+★cuda version confirm
+nvidia-smi -l
+cuDNN and TensorRT will be installed [Y/n] 
+------------------------------------
+■ROS noetic
+★https://www.stereolabs.com/docs/ros/
+ROS has a strict versioning scheme that aligns with different versions of Ubuntu. Ex:
+    Ubuntu 14 (aka Trusty) == ROS Indigo
+    Ubuntu 16 (aka Xenial) == ROS Kinetic
+    Ubuntu 18 (aka Bionic) == ROS Melodic
+    Ubuntu 20 (aka Focal) == ROS Noetic
+    Ubuntu 22 (N/A)
+●download
+https://varhowto.com/install-ros-noetic-ubuntu-20-04/
+----------------------------------------
+●OS noetic ubuntu20.04　インストールコマンド
+echo "deb http://packages.ros.org/ros/ubuntu focal main" | sudo tee /etc/apt/sources.list.d/ros-focal.list
+sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+curl -sSL 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0xC1CF6E31E6BADE8868B172B4F42ED6FBAB17C654' | sudo apt-key add -
+sudo apt update
+sudo apt install ros-noetic-desktop-full
+
+***************************
+■Starting the ZED node
+The ZED is available in ROS as a node that publishes its data to topics. You can read the full list of available topics here.
+
+Open a terminal and use roslaunch to start the ZED node:
+https://github.com/stereolabs/zed-ros-wrapper
+ZED camera: $ roslaunch zed_wrapper zed.launch
+ZED Mini camera: $ roslaunch zed_wrapper zedm.launch
+ZED 2 camera: $ roslaunch zed_wrapper zed2.launch
+
+
+   
+■ros-noetic-core　インストールコマンド なしで大丈夫？？？
+https://varhowto.com/install-ros-noetic-ubuntu-20-04/#Install_rosnoeticcore
+●インストールコマンド
+##sudo apt install ros-noetic-core
+source /opt/ros/noetic/setup.bash
+echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+echo "source /opt/ros/noetic/setup.zsh" >> ~/.zshrc
+
+sudo apt-get install python3-rosdep
+sudo rosdep init
+rosdep update
+■Verify Noetic installation
+roscd
+roscore
+
+**********************************
+■dispay
+https://www.stereolabs.com/docs/ros/
+cd ~00_zed
+git clone https://github.com/stereolabs/zed-ros-wrapper.git
+cd ../
+rosdep install --from-paths src --ignore-src -r -y
+catkin_make -DCMAKE_BUILD_TYPE=Release
+source ./devel/setup.bash
+-------
+git clone https://github.com/stereolabs/zed-ros-examples.git
+cd ../
+rosdep install --from-paths src --ignore-src -r -y
+catkin_make -DCMAKE_BUILD_TYPE=Release
+source ./devel/setup.bash
+●画面起動
+roslaunch zed_display_rviz display_zed2.launch
+roslaunch zed_display_rviz display_zed.launch
+
+
+■開発関連インストール
+*********pip install ************************************
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+sudo python3 get-pip.py
+
+**************zed2 api*******************************************
+https://www.stereolabs.com/docs/app-development/python/install/
+
+python3 -m pip install cython numpy opencv-python pyopengl
+cd "/usr/local/zed/"
+python3 get_python_api.py
+python3 -m pip install pyzed-3.2-cp38-cp38-linux_x86_64.whl
+
+
+■ソースコード　
+https://github.com/stereolabs/zed-opencv/blob/master/python/zed-opencv.py
+
+
+
+
+
+■ソース
+zed.grab(runtime_parameters)
+zed.retrieve_image(image, sl.VIEW.LEFT)
+zed.retrieve_measure(depth, sl.MEASURE.DEPTH)
+zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA)
+x = round(image.get_width() / 2)
+y = round(image.get_height() / 2)
+err, point_cloud_value = point_cloud.get_value(x, y)
+print(point_cloud_value)
+distance = math.sqrt(point_cloud_value[0] * point_cloud_value[0] +
+             point_cloud_value[1] * point_cloud_value[1] +
+             point_cloud_value[2] * point_cloud_value[2])
+
+point_cloud_np = point_cloud.get_data()
+point_cloud_np.dot(tr_np)
+
