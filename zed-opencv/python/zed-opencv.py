@@ -68,7 +68,7 @@ def export_list_csv(export_list, csv_dir):
 def save_point_cloud(zed, filename,pose_lst) :
     print("Saving Point Cloud...")
     tmp = sl.Mat()
-    zed.retrieve_measure(tmp, sl.MEASURE.XYZRGBA)
+    zed.retrieve_measure(tmp, sl.MEASURE.XYZRGBA,sl.MEM.GPU)
     saved = (tmp.write(filename + point_cloud_format_ext) == sl.ERROR_CODE.SUCCESS)
     if saved :
         print("Done")

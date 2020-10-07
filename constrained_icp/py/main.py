@@ -18,12 +18,17 @@ icp_dist_fine = voxel_size * 5
 
 def main():
     pcds = []
+    poses = np.loadtxt('./data/poses.txt')[:, 1:]
+    poses=[]
     for i in range(file_id_start, file_id_stop + 1, 1):
-        pcd_file = './data/pcd_%d.pcd' % (i)
-        # pcd_file='C:/00_work/05_src/zed2/zed-opencv/python/Depth_%d.pcd' % (i)
+        # pcd_file = './data/pcd_%d.pcd' % (i)
+        pcd_file='C:/00_work/05_src/zed2/zed-opencv/python/Cloud_%d.pcd' % (i)
         print("Reading %s..."%(pcd_file))
         pcd = o3d.io.read_point_cloud(pcd_file)
         pcds.append(pcd)
+        pose_file='C:/00_work/05_src/zed2/zed-opencv/python/Cloud_%d.csv' % (i)
+        pose = np.loadtxt(pose_file)
+        poses.append(pose)
 
     pcds = crop_clouds_by_depth(pcds, max_point_depth)
     pcds = remove_clouds_outliers(pcds, 30, voxel_size, 1)  # removing outliers before downsample give good result.
@@ -31,7 +36,7 @@ def main():
     # pcds = remove_clouds_outliers(pcds, 5, 0.03, 1)
     estimate_clouds_normals(pcds, voxel_size * 5, 30)
 
-    poses = np.loadtxt('./data/poses.txt')[:, 1:]
+    # poses = np.loadtxt('./data/poses.txt')[:, 1:]
     transforms = translations_quaternions_to_transforms(poses)
     pcds = transform_clouds_by_pose(pcds, transforms)
 
