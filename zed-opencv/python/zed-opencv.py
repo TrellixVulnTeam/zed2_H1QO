@@ -2,6 +2,7 @@ import sys
 import numpy as np
 import pyzed.sl as sl
 import cv2
+import pandas as pd
 
 help_string = "[s] Save side by side image [d] Save Depth, [n] Change Depth format, [p] Save Point Cloud, [m] Change Point Cloud format, [q] Quit"
 prefix_point_cloud = "Cloud_"
@@ -37,21 +38,39 @@ def depth_format_name():
     }
     return switcher.get(mode_depth, "nothing") 
 
+def save_tracing_dt(zed,filename) :
+    camera_pose = sl.Pose()
+    py_translation = sl.Translation()
+    tracking_state = zed.get_position(camera_pose)
+    if tracking_state == sl.POSITIONAL_TRACKING_STATE.OK:
+        rotation = camera_pose.get_rotation_vector()
+        translation = camera_pose.get_translation(py_translation)
+        rx=rotation[0]
+        ry=rotation[1]
+        rz=rotation[3]
+        ro=rotation[4]
+        tx = translation.get()[0]
+        ty = translation.get()[1]
+        tz = translation.get()[2]
+    pose_lst=[tx,ty,tz,rx,ry,rz,ro]
+    df=pd.DataFrame(pose_lst)
+    df.to_csv(filename+'.csv',header=None, index=None)
 def save_point_cloud(zed, filename) :
     print("Saving Point Cloud...")
     tmp = sl.Mat()
-    zed.retrieve_measure(tmp, sl.MEASURE.DEPTH)
-    saved = (tmp.write(filename + depth_format_ext) == sl.ERROR_CODE.SUCCESS)
+    zed.retrieve_measure(tmp, sl.MEASURE.XYZRGBA)
+    saved = (tmp.write(filename + point_cloud_format_ext) == sl.ERROR_CODE.SUCCESS)
     if saved :
         print("Done")
     else :
         print("Failed... Please check that you have permissions to write on disk")
+    save_tracing_dt(zed,filename)
 
 def save_depth(zed, filename) :
     print("Saving Depth Map...")
     tmp = sl.Mat()
-    zed.retrieve_measure(tmp, sl.MEASURE.XYZRGBA)
-    saved = (tmp.write(filename + point_cloud_format_ext) == sl.ERROR_CODE.SUCCESS)
+    zed.retrieve_measure(tmp, sl.MEASURE.DEPTH)
+    saved = (tmp.write(filename + depth_format_ext) == sl.ERROR_CODE.SUCCESS)
     if saved :
         print("Done")
     else :
@@ -119,10 +138,9 @@ def main() :
     if len(sys.argv) >= 2 :
         input_type.set_from_svo_file(sys.argv[1])
     init = sl.InitParameters(input_t=input_type)
-    init.camera_resolution = sl.RESOLUTION.HD1080
+    init.camera_resolution = sl.RESOLUTION.HD720
     init.depth_mode = sl.DEPTH_MODE.PERFORMANCE
     init.coordinate_units = sl.UNIT.MILLIMETER
-
     # Open the camera
     err = zed.open(init)
     if err != sl.ERROR_CODE.SUCCESS :
