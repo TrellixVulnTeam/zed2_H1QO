@@ -38,23 +38,23 @@ def depth_format_name():
     }
     return switcher.get(mode_depth, "nothing") 
 
-def save_tracing_dt(zed,filename,camera_pose,py_translation) :
-    tracking_state = zed.get_position(camera_pose)
-    if tracking_state == sl.POSITIONAL_TRACKING_STATE.OK:
-        # rotation = camera_pose.get_rotation_vector()
-        rotation = camera_pose.get_orientation()
-        rx=rotation[0]
-        ry=rotation[1]
-        rz=rotation[3]
-        ro=rotation[4]
-        translation = camera_pose.get_translation(py_translation)
-        tx = translation.get()[0]
-        ty = translation.get()[1]
-        tz = translation.get()[2]
-        pose_lst=[tx,ty,tz,rx,ry,rz,ro]
-        df=pd.DataFrame(pose_lst)
-        df.to_csv(filename+'.csv',header=None, index=None)
-def save_point_cloud(zed, filename,camera_pose,py_translation) :
+# def save_tracing_dt(zed,filename,camera_pose,py_translation) :
+#     tracking_state = zed.get_position(camera_pose)
+#     if tracking_state == sl.POSITIONAL_TRACKING_STATE.OK:
+#         # rotation = camera_pose.get_rotation_vector()
+#         rotation = camera_pose.get_orientation()
+#         rx=rotation[0]
+#         ry=rotation[1]
+#         rz=rotation[3]
+#         ro=rotation[4]
+#         translation = camera_pose.get_translation(py_translation)
+#         tx = translation.get()[0]
+#         ty = translation.get()[1]
+#         tz = translation.get()[2]
+#         pose_lst=[tx,ty,tz,rx,ry,rz,ro]
+#         df=pd.DataFrame(pose_lst)
+#         df.to_csv(filename+'.csv',header=None, index=None)
+def save_point_cloud(zed, filename,pose_lst) :
     print("Saving Point Cloud...")
     tmp = sl.Mat()
     zed.retrieve_measure(tmp, sl.MEASURE.XYZRGBA)
@@ -63,7 +63,8 @@ def save_point_cloud(zed, filename,camera_pose,py_translation) :
         print("Done")
     else :
         print("Failed... Please check that you have permissions to write on disk")
-    save_tracing_dt(zed,filename,camera_pose,py_translation)
+    df = pd.DataFrame(pose_lst)
+    df.to_csv(filename + '.csv', header=None, index=None)
 
 def save_depth(zed, filename) :
     print("Saving Depth Map...")
@@ -90,7 +91,7 @@ def save_sbs_image(zed, filename) :
     cv2.imwrite(filename, sbs_image)
     
 
-def process_key_event(zed, key,camera_pose,py_translation) :
+def process_key_event(zed, key,pose_lst) :
     global mode_depth
     global mode_point_cloud
     global count_save
@@ -105,7 +106,7 @@ def process_key_event(zed, key,camera_pose,py_translation) :
         depth_format_ext = depth_format_name()
         print("Depth format: ", depth_format_ext)
     elif key == 112 or key == 80:
-        save_point_cloud(zed, path + prefix_point_cloud + str(count_save),camera_pose,py_translation)
+        save_point_cloud(zed, path + prefix_point_cloud + str(count_save),pose_lst)
         count_save += 1
     elif key == 109 or key == 77:
         mode_point_cloud += 1
@@ -146,12 +147,15 @@ def main() :
         print(repr(err))
         zed.close()
         exit(1)
-
-    transform = sl.Transform()
-    tracking_params = sl.PositionalTrackingParameters(transform)
-    zed.enable_positional_tracking(tracking_params)
-    camera_pose = sl.Pose()
-    py_translation = sl.Translation()
+    #https://github.com/stereolabs/zed-examples/blob/master/tutorials/tutorial%204%20-%20positional%20tracking/python/positional_tracking.py
+    py_transform = sl.Transform()
+    tracking_parameters = sl.PositionalTrackingParameters(init_pos=py_transform)
+    err = zed.enable_positional_tracking(tracking_parameters)
+    if err != sl.ERROR_CODE.SUCCESS:
+        exit(1)
+    zed_pose = sl.Pose()
+    zed_sensors = sl.SensorsData()
+    # py_translation = sl.Translation()
     # Display help in console
     print_help()
 
@@ -188,8 +192,23 @@ def main() :
             cv2.imshow("Depth", depth_image_ocv)
 
             key = cv2.waitKey(10)
+            zed.get_position(zed_pose, sl.REFERENCE_FRAME.WORLD)
+            zed.get_sensors_data(zed_sensors, sl.TIME_REFERENCE.IMAGE)
+            zed_imu = zed_sensors.get_imu_data()# Display the translation and timestamp
+            py_translation = sl.Translation()
+            tx = round(zed_pose.get_translation(py_translation).get()[0], 3)
+            ty = round(zed_pose.get_translation(py_translation).get()[1], 3)
+            tz = round(zed_pose.get_translation(py_translation).get()[2], 3)
+            print("Translation: Tx: {0}, Ty: {1}, Tz {2}, Timestamp: {3}\n".format(tx, ty, tz, zed_pose.timestamp.get_milliseconds()))
 
-            process_key_event(zed, key,camera_pose,py_translation)
+            # Display the orientation quaternion
+            py_orientation = sl.Orientation()
+            ox = round(zed_pose.get_orientation(py_orientation).get()[0], 3)
+            oy = round(zed_pose.get_orientation(py_orientation).get()[1], 3)
+            oz = round(zed_pose.get_orientation(py_orientation).get()[2], 3)
+            ow = round(zed_pose.get_orientation(py_orientation).get()[3], 3)
+            pose_lst=[tx,ty,tz,ow,ox,oy,oz]
+            process_key_event(zed, key,pose_lst)
 
     cv2.destroyAllWindows()
     zed.close()
