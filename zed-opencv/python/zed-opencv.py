@@ -54,6 +54,16 @@ def depth_format_name():
 #         pose_lst=[tx,ty,tz,rx,ry,rz,ro]
 #         df=pd.DataFrame(pose_lst)
 #         df.to_csv(filename+'.csv',header=None, index=None)
+def export_list_csv(export_list, csv_dir):
+
+    with open(csv_dir, "a") as f:
+        writer = cv2.writer(f, lineterminator='\n')
+
+        if isinstance(export_list[0], list): #多次元の場合
+            writer.writerows(export_list)
+
+        else:
+            writer.writerow(export_list)
 def save_point_cloud(zed, filename,pose_lst) :
     print("Saving Point Cloud...")
     tmp = sl.Mat()
@@ -63,9 +73,7 @@ def save_point_cloud(zed, filename,pose_lst) :
         print("Done")
     else :
         print("Failed... Please check that you have permissions to write on disk")
-    df = pd.DataFrame(pose_lst)
-    df.to_csv(filename + '.csv', header=None, index=None)
-
+    export_list_csv(pose_lst,filename + '.csv')
 def save_depth(zed, filename) :
     print("Saving Depth Map...")
     tmp = sl.Mat()
