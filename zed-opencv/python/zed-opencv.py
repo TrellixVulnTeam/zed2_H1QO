@@ -52,9 +52,9 @@ def save_tracing_dt(zed,filename) :
         tx = translation.get()[0]
         ty = translation.get()[1]
         tz = translation.get()[2]
-    pose_lst=[tx,ty,tz,rx,ry,rz,ro]
-    df=pd.DataFrame(pose_lst)
-    df.to_csv(filename+'.csv',header=None, index=None)
+        pose_lst=[tx,ty,tz,rx,ry,rz,ro]
+        df=pd.DataFrame(pose_lst)
+        df.to_csv(filename+'.csv',header=None, index=None)
 def save_point_cloud(zed, filename) :
     print("Saving Point Cloud...")
     tmp = sl.Mat()
