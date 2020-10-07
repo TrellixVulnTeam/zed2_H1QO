@@ -38,9 +38,7 @@ def depth_format_name():
     }
     return switcher.get(mode_depth, "nothing") 
 
-def save_tracing_dt(zed,filename) :
-    camera_pose = sl.Pose()
-    py_translation = sl.Translation()
+def save_tracing_dt(zed,filename,camera_pose,py_translation) :
     tracking_state = zed.get_position(camera_pose)
     if tracking_state == sl.POSITIONAL_TRACKING_STATE.OK:
         rotation = camera_pose.get_rotation_vector()
@@ -55,7 +53,7 @@ def save_tracing_dt(zed,filename) :
         pose_lst=[tx,ty,tz,rx,ry,rz,ro]
         df=pd.DataFrame(pose_lst)
         df.to_csv(filename+'.csv',header=None, index=None)
-def save_point_cloud(zed, filename) :
+def save_point_cloud(zed, filename,camera_pose,py_translation) :
     print("Saving Point Cloud...")
     tmp = sl.Mat()
     zed.retrieve_measure(tmp, sl.MEASURE.XYZRGBA)
@@ -64,7 +62,7 @@ def save_point_cloud(zed, filename) :
         print("Done")
     else :
         print("Failed... Please check that you have permissions to write on disk")
-    save_tracing_dt(zed,filename)
+    save_tracing_dt(zed,filename,camera_pose,py_translation)
 
 def save_depth(zed, filename) :
     print("Saving Depth Map...")
@@ -91,7 +89,7 @@ def save_sbs_image(zed, filename) :
     cv2.imwrite(filename, sbs_image)
     
 
-def process_key_event(zed, key) :
+def process_key_event(zed, key,camera_pose,py_translation) :
     global mode_depth
     global mode_point_cloud
     global count_save
@@ -106,7 +104,7 @@ def process_key_event(zed, key) :
         depth_format_ext = depth_format_name()
         print("Depth format: ", depth_format_ext)
     elif key == 112 or key == 80:
-        save_point_cloud(zed, path + prefix_point_cloud + str(count_save))
+        save_point_cloud(zed, path + prefix_point_cloud + str(count_save),camera_pose,py_translation)
         count_save += 1
     elif key == 109 or key == 77:
         mode_point_cloud += 1
@@ -148,6 +146,11 @@ def main() :
         zed.close()
         exit(1)
 
+    transform = sl.Transform()
+    tracking_params = sl.PositionalTrackingParameters(transform)
+    zed.enable_positional_tracking(tracking_params)
+    camera_pose = sl.Pose()
+    py_translation = sl.Translation()
     # Display help in console
     print_help()
 
@@ -185,7 +188,7 @@ def main() :
 
             key = cv2.waitKey(10)
 
-            process_key_event(zed, key)
+            process_key_event(zed, key,camera_pose,py_translation)
 
     cv2.destroyAllWindows()
     zed.close()
