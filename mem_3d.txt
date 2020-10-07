@@ -118,12 +118,13 @@ python3 -m pip install pyzed-3.2-cp38-cp38-linux_x86_64.whl
 
 
 ■ソースコード　
-https://github.com/stereolabs/zed-opencv/blob/master/python/zed-opencv.py
+①https://github.com/stereolabs/zed-opencv/blob/master/python/zed-opencv.py
+python3 zed-opencv.pyコマンドでpointcloud,depth image, など出力できました。
+②カメラのparameter calibration and pose data
 
 
 
-
-
+roslaunch zed_wrapper zed2.launch svo_file:=zed.svo
 ■ソース
 zed.grab(runtime_parameters)
 zed.retrieve_image(image, sl.VIEW.LEFT)
@@ -139,4 +140,15 @@ distance = math.sqrt(point_cloud_value[0] * point_cloud_value[0] +
 
 point_cloud_np = point_cloud.get_data()
 point_cloud_np.dot(tr_np)
+
+
+git push -u origin master
+
+cd "/usr/local/zed/"
+mkdir build
+cd build
+cmake ..
+make 
+./ZED_Positional_Tracking
+
 

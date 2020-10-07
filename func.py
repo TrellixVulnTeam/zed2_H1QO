@@ -100,3 +100,21 @@ def process_key_event(zed, key) :
     zed.close()
 
     print("\nFINISH")
+
+
+
+zed = sl.Camera()
+
+# Set configuration parameters
+input_type = sl.InputType()
+if len(sys.argv) >= 2 :
+     input_type.set_from_svo_file(sys.argv[1])
+init = sl.InitParameters(input_t=input_type)
+init.camera_resolution = sl.RESOLUTION.HD1080
+init.depth_mode = sl.DEPTH_MODE.PERFORMANCE
+init.coordinate_units = sl.UNIT.MILLIMETER
+   # Open the camera
+err = zed.open(init)
+print(repr(err))
+zed.close()
+
