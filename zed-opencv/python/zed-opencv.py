@@ -199,7 +199,7 @@ def main() :
             tx = round(zed_pose.get_translation(py_translation).get()[0], 3)
             ty = round(zed_pose.get_translation(py_translation).get()[1], 3)
             tz = round(zed_pose.get_translation(py_translation).get()[2], 3)
-            print("Translation: Tx: {0}, Ty: {1}, Tz {2}, Timestamp: {3}\n".format(tx, ty, tz, zed_pose.timestamp.get_milliseconds()))
+            # print("Translation: Tx: {0}, Ty: {1}, Tz {2}, Timestamp: {3}\n".format(tx, ty, tz, zed_pose.timestamp.get_milliseconds()))
 
             # Display the orientation quaternion
             py_orientation = sl.Orientation()
