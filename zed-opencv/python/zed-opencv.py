@@ -42,7 +42,7 @@ def save_tracing_dt(zed,filename,camera_pose,py_translation) :
     tracking_state = zed.get_position(camera_pose)
     if tracking_state == sl.POSITIONAL_TRACKING_STATE.OK:
         # rotation = camera_pose.get_rotation_vector()
-        rotation = camera_pose.Orientation()
+        rotation = camera_pose.get_orientation()
         rx=rotation[0]
         ry=rotation[1]
         rz=rotation[3]
