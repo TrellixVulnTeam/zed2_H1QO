@@ -2,6 +2,7 @@ import sys
 import numpy as np
 import pyzed.sl as sl
 import cv2
+import csv
 import pandas as pd
 
 help_string = "[s] Save side by side image [d] Save Depth, [n] Change Depth format, [p] Save Point Cloud, [m] Change Point Cloud format, [q] Quit"
@@ -57,7 +58,7 @@ def depth_format_name():
 def export_list_csv(export_list, csv_dir):
 
     with open(csv_dir, "a") as f:
-        writer = cv2.writer(f, lineterminator='\n')
+        writer = csv.writer(f, lineterminator='\n')
 
         if isinstance(export_list[0], list): #多次元の場合
             writer.writerows(export_list)
