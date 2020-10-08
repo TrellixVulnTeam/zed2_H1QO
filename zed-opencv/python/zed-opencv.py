@@ -147,7 +147,7 @@ def get_camera_intrintic_info(zed):
         [0, 0,  1]
     ]
     return k
-def process_key_event(zed, key,zed_pose, sl) :
+def process_key_event(zed, key,zed_pose, sl,image_zed,depth_image_zed,point_cloud,image_size):
     global mode_depth
     global mode_point_cloud
     global count_save
@@ -177,6 +177,17 @@ def process_key_event(zed, key,zed_pose, sl) :
         print("create reconstruction datadd")
         for count_save in range(100):
             print(count_save)
+            # Retrieve the left image, depth image in the half-resolution
+            zed.retrieve_image(image_zed, sl.VIEW.LEFT, sl.MEM.CPU, image_size)
+            zed.retrieve_image(depth_image_zed, sl.VIEW.DEPTH, sl.MEM.CPU, image_size)
+            # Retrieve the RGBA point cloud in half resolution
+            zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.CPU, image_size)
+
+            # To recover data from sl.Mat to use it with opencv, use the get_data() method
+            # It returns a numpy array that can be used as a matrix with opencv
+            image_ocv = image_zed.get_data()
+            depth_image_ocv = depth_image_zed.get_data()
+
             pose_lst=get_pos_dt(zed, zed_pose, sl)
             translation=translations_quaternions_to_transform(pose_lst)
             df=pd.DataFrame(translation)
@@ -185,7 +196,7 @@ def process_key_event(zed, key,zed_pose, sl) :
             filename=path+prefix_reconstruction+"-%06d.depth"%(count_save)
             save_depth(zed,filename)
             filename=path+prefix_reconstruction+"-%06d.color"%(count_save)
-            image_ocv=save_left_image(zed,filename + ".jpg")
+            save_left_image(zed,filename + ".jpg")
             cv2.imshow("Image", image_ocv)
             time.sleep(1)
         count_save=0
@@ -273,7 +284,7 @@ def main() :
             cv2.imshow("Depth", depth_image_ocv)
 
             key = cv2.waitKey(10)
-            process_key_event(zed, key,zed_pose, sl)
+            process_key_event(zed, key,zed_pose, sl,image_zed,depth_image_zed,point_cloud,image_size)
 
     cv2.destroyAllWindows()
     zed.close()
