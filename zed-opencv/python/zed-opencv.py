@@ -167,7 +167,9 @@ def process_key_event(zed, key,zed_pose, sl) :
     elif key == 104 or key == 72:#h
         print(help_string)
     elif key == 82:#R
+        print("create reconstruction datadd")
         for count_save in range(100):
+            print(count_save)
             pose_lst=get_pos_dt(zed, zed_pose, sl)
             translation=translations_quaternions_to_transform(pose_lst)
             df=pd.DataFrame(translation)
@@ -178,6 +180,7 @@ def process_key_event(zed, key,zed_pose, sl) :
             filename=path+prefix_reconstruction+"-%06d.color"%(count_save)
             save_sbs_image(filename + ".jpg")
             time.sleep(2)
+        count_save=0
     elif key == 115:#f4
         save_sbs_image(zed, "ZED_image" + str(count_save) + ".jpg")
         count_save += 1
@@ -188,6 +191,7 @@ def print_help() :
     print(" Press 's' to save Side by side images")
     print(" Press 'p' to save Point Cloud")
     print(" Press 'd' to save Depth image")
+    print(" Press 'r' to save reconstruction data")
     print(" Press 'm' to switch Point Cloud format")
     print(" Press 'n' to switch Depth format")
 
