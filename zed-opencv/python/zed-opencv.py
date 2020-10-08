@@ -11,7 +11,7 @@ help_string = "[s] Save side by side image [d] Save Depth, [n] Change Depth form
 prefix_point_cloud = "Cloud_"
 prefix_depth = "Depth_"
 prefix_reconstruction = "reconstruction"
-path = "./"
+path = "./data/"
 
 count_save = 0
 mode_point_cloud = 0
@@ -128,6 +128,13 @@ def save_sbs_image(zed, filename) :
     sbs_image = np.concatenate((image_cv_left, image_cv_right), axis=1)
 
     cv2.imwrite(filename, sbs_image)
+
+def save_left_image(zed, filename) :
+    image_sl_left = sl.Mat()
+    zed.retrieve_image(image_sl_left, sl.VIEW.LEFT)
+    image_cv_left = image_sl_left.get_data()
+    cv2.imwrite(filename, image_cv_left)
+    return image_cv_left
 def get_camera_intrintic_info(zed):
     cx = zed.get_camera_information().calibration_parameters.left_cam.cx
     cy = zed.get_camera_information().calibration_parameters.left_cam.cy
@@ -178,8 +185,9 @@ def process_key_event(zed, key,zed_pose, sl) :
             filename=path+prefix_reconstruction+"-%06d.depth"%(count_save)
             save_depth(zed,filename)
             filename=path+prefix_reconstruction+"-%06d.color"%(count_save)
-            save_sbs_image(zed,filename + ".jpg")
-            time.sleep(2)
+            image_ocv=save_left_image(zed,filename + ".jpg")
+            cv2.imshow("Image", image_ocv)
+            time.sleep(1)
         count_save=0
     elif key == 115:#f4
         save_sbs_image(zed, "ZED_image" + str(count_save) + ".jpg")
