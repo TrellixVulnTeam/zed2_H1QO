@@ -3,15 +3,15 @@ import numpy as np
 # import transformations as tr
 from transforms3d.quaternions import quat2mat, mat2quat
 import constrained_icp as cicp
-
+import pandas as pd
 # o3d = open3d
 
 file_id_start =0
-file_id_stop = 16
+file_id_stop = 8
 
-voxel_size = 0.02
-max_point_depth = 100000
-max_point_depth = 2
+voxel_size = 0.01
+max_point_depth = 10000
+# max_point_depth = 2
 icp_dist_coarse = voxel_size * 15
 icp_dist_fine = voxel_size * 5
 
@@ -27,8 +27,8 @@ def main():
         pcd = o3d.io.read_point_cloud(pcd_file)
         pcds.append(pcd)
         pose_file='C:/00_work/05_src/zed2/zed-opencv/python/Cloud_%d.csv' % (i)
-        pose = np.loadtxt(pose_file)
-        poses.append(pose)
+        df=pd.read_csv(pose_file,header=None)
+        poses.append(df.values.tolist()[0])
 
     pcds = crop_clouds_by_depth(pcds, max_point_depth)
     pcds = remove_clouds_outliers(pcds, 30, voxel_size, 1)  # removing outliers before downsample give good result.
@@ -96,21 +96,21 @@ def pairwise_registration(source, target, init_transform, dist_coarse, dist_fine
 
 
 def build_pose_graph(pcds, transforms, dist_coarse, dist_fine):
-    pose_graph = o3d.PoseGraph()
-    pose_graph.nodes.append(o3d.PoseGraphNode(transforms[0]))
+    pose_graph =  o3d.registration.PoseGraph()
+    pose_graph.nodes.append(o3d.registration.PoseGraphNode(transforms[0]))
 
     for i in range(1, len(pcds)):
-        pose_graph.nodes.append(o3d.PoseGraphNode(transforms[i]))
+        pose_graph.nodes.append(o3d.registration.PoseGraphNode(transforms[i]))
         # odometry = transforms[i] @ np.linalg.inv(transforms[i-1])
         transform, information = pairwise_registration(pcds[i - 1], pcds[i], np.eye(4), dist_coarse, dist_fine)
-        pose_graph.edges.append(o3d.PoseGraphEdge(i-1, i, transform, information, uncertain=False))
+        pose_graph.edges.append(o3d.registration.PoseGraphEdge(i-1, i, transform, information, uncertain=False))
 
         # if i >= 2:
         #     transform, information = pairwise_registration(pcds[i - 2], pcds[i], np.eye(4), dist_coarse, dist_fine)
         #     pose_graph.edges.append(o3d.PoseGraphEdge(i - 2, i, transform, information, uncertain=True))
 
     transform, information = pairwise_registration(pcds[len(pcds)-1], pcds[0], np.eye(4), dist_coarse, dist_fine)
-    pose_graph.edges.append(o3d.PoseGraphEdge(len(pcds)-1, 0, transform, information, uncertain=True))
+    pose_graph.edges.append(o3d.registration.PoseGraphEdge(len(pcds)-1, 0, transform, information, uncertain=True))
     return pose_graph
 
 

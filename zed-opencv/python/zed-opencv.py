@@ -4,10 +4,13 @@ import pyzed.sl as sl
 import cv2
 import csv
 import pandas as pd
+import time
+from transforms3d.quaternions import quat2mat, mat2quat
 
 help_string = "[s] Save side by side image [d] Save Depth, [n] Change Depth format, [p] Save Point Cloud, [m] Change Point Cloud format, [q] Quit"
 prefix_point_cloud = "Cloud_"
 prefix_depth = "Depth_"
+prefix_reconstruction = "reconstruction_"
 path = "./"
 
 count_save = 0
@@ -15,7 +18,14 @@ mode_point_cloud = 0
 mode_depth = 0
 point_cloud_format_ext = ".ply"
 depth_format_ext = ".png"
+def translations_quaternions_to_transform(pose):
+    t = pose[:3]
+    q = pose[3:]
 
+    T = np.eye(4)
+    T[:3, :3] = quat2mat(q)
+    T[:3, 3] = t
+    return T
 def point_cloud_format_name(): 
     global mode_point_cloud
     if mode_point_cloud > 3:
@@ -55,26 +65,46 @@ def depth_format_name():
 #         pose_lst=[tx,ty,tz,rx,ry,rz,ro]
 #         df=pd.DataFrame(pose_lst)
 #         df.to_csv(filename+'.csv',header=None, index=None)
+
+def get_pos_dt(zed, zed_pose, sl):
+    zed.get_position(zed_pose, sl.REFERENCE_FRAME.WORLD)
+    # zed.get_sensors_data(zed_sensors, sl.TIME_REFERENCE.IMAGE)
+    # zed_imu = zed_sensors.get_imu_data()  # Display the translation and timestamp
+    py_translation = sl.Translation()
+    tx = round(zed_pose.get_translation(py_translation).get()[0], 3)
+    ty = round(zed_pose.get_translation(py_translation).get()[1], 3)
+    tz = round(zed_pose.get_translation(py_translation).get()[2], 3)
+    # print("Translation: Tx: {0}, Ty: {1}, Tz {2}, Timestamp: {3}\n".format(tx, ty, tz, zed_pose.timestamp.get_milliseconds()))
+
+    # Display the orientation quaternion
+    py_orientation = sl.Orientation()
+    ox = round(zed_pose.get_orientation(py_orientation).get()[0], 3)
+    oy = round(zed_pose.get_orientation(py_orientation).get()[1], 3)
+    oz = round(zed_pose.get_orientation(py_orientation).get()[2], 3)
+    ow = round(zed_pose.get_orientation(py_orientation).get()[3], 3)
+    pose_lst = [tx, ty, tz, ow, ox, oy, oz]
+    return pose_lst
+
 def export_list_csv(export_list, csv_dir):
 
-    with open(csv_dir, "a") as f:
+    with open(csv_dir, "w") as f:
         writer = csv.writer(f, lineterminator='\n')
 
         if isinstance(export_list[0], list): #多次元の場合
-            writer.writerows(export_list)
+            writer.writerows(export_list,delimiter=' ')
 
         else:
             writer.writerow(export_list)
-def save_point_cloud(zed, filename,pose_lst) :
+def save_point_cloud(zed, filename) :
     print("Saving Point Cloud...")
     tmp = sl.Mat()
-    zed.retrieve_measure(tmp, sl.MEASURE.XYZRGBA,sl.MEM.GPU)
+    zed.retrieve_measure(tmp, sl.MEASURE.XYZRGBA)
     saved = (tmp.write(filename + point_cloud_format_ext) == sl.ERROR_CODE.SUCCESS)
     if saved :
         print("Done")
     else :
         print("Failed... Please check that you have permissions to write on disk")
-    export_list_csv(pose_lst,filename + '.csv')
+
 def save_depth(zed, filename) :
     print("Saving Depth Map...")
     tmp = sl.Mat()
@@ -98,33 +128,58 @@ def save_sbs_image(zed, filename) :
     sbs_image = np.concatenate((image_cv_left, image_cv_right), axis=1)
 
     cv2.imwrite(filename, sbs_image)
-    
-
-def process_key_event(zed, key,pose_lst) :
+def get_camera_intrintic_info(zed):
+    cx = zed.get_camera_information().calibration_parameters.left_cam.cx
+    cy = zed.get_camera_information().calibration_parameters.left_cam.cy
+    fx = zed.get_camera_information().calibration_parameters.left_cam.fx
+    fy = zed.get_camera_information().calibration_parameters.left_cam.fy
+    distortion = zed.get_camera_information().calibration_parameters.left_cam.disto
+    k=[
+        [fx,0, cx],
+        [0, fy,cy],
+        [0, 0,  1]
+    ]
+    return k
+def process_key_event(zed, key,zed_pose, sl) :
     global mode_depth
     global mode_point_cloud
     global count_save
     global depth_format_ext
     global point_cloud_format_ext
 
-    if key == 100 or key == 68:
+    if key == 100 or key == 68: #d
         save_depth(zed, path + prefix_depth + str(count_save))
         count_save += 1
-    elif key == 110 or key == 78:
+    elif key == 110 or key == 78:#N
         mode_depth += 1
         depth_format_ext = depth_format_name()
         print("Depth format: ", depth_format_ext)
-    elif key == 112 or key == 80:
-        save_point_cloud(zed, path + prefix_point_cloud + str(count_save),pose_lst)
+    elif key == 112 or key == 80:#p
+        filename=path + prefix_point_cloud + str(count_save)
+        save_point_cloud(zed, filename)
+        pose_lst=get_pos_dt(zed, zed_pose, sl)
+        export_list_csv(pose_lst, filename + '.csv')
         count_save += 1
-    elif key == 109 or key == 77:
+    elif key == 109 or key == 77:#m
         mode_point_cloud += 1
         point_cloud_format_ext = point_cloud_format_name()
         print("Point Cloud format: ", point_cloud_format_ext)
-    elif key == 104 or key == 72:
+    elif key == 104 or key == 72:#h
         print(help_string)
-    elif key == 115:
-        save_sbs_image(zed, "ZED_image" + str(count_save) + ".png")
+    elif key == 82:#R
+        for count_save in range(100):
+            pose_lst=get_pos_dt(zed, zed_pose, sl)
+            translation=translations_quaternions_to_transform(pose_lst)
+            df=pd.DataFrame(translation)
+            filename=path+prefix_reconstruction+"-%06d.pose"%(count_save)
+            df.to_csv(filename+'.txt',sep=' ',header=None,index=None)
+            filename=path+prefix_reconstruction+"-%06d.depth"%(count_save)
+            save_depth(filename)
+            filename=path+prefix_reconstruction+"-%06d.color"%(count_save)
+            save_sbs_image(filename + ".jpg")
+            time.sleep(2)
+    elif key == 115:#f4
+        save_sbs_image(zed, "ZED_image" + str(count_save) + ".jpg")
         count_save += 1
     else:
         a = 0
@@ -181,7 +236,11 @@ def main() :
     image_zed = sl.Mat(image_size.width, image_size.height, sl.MAT_TYPE.U8_C4)
     depth_image_zed = sl.Mat(image_size.width, image_size.height, sl.MAT_TYPE.U8_C4)
     point_cloud = sl.Mat()
-
+    ########
+    cam_intr=get_camera_intrintic_info(zed)
+    filename = path + "camera-intrinsics.txt"
+    df = pd.DataFrame(cam_intr)
+    df.to_csv(filename , sep=' ', header=None, index=None)
     key = ' '
     while key != 113 :
         err = zed.grab(runtime)
@@ -201,27 +260,10 @@ def main() :
             cv2.imshow("Depth", depth_image_ocv)
 
             key = cv2.waitKey(10)
-            zed.get_position(zed_pose, sl.REFERENCE_FRAME.WORLD)
-            zed.get_sensors_data(zed_sensors, sl.TIME_REFERENCE.IMAGE)
-            zed_imu = zed_sensors.get_imu_data()# Display the translation and timestamp
-            py_translation = sl.Translation()
-            tx = round(zed_pose.get_translation(py_translation).get()[0], 3)
-            ty = round(zed_pose.get_translation(py_translation).get()[1], 3)
-            tz = round(zed_pose.get_translation(py_translation).get()[2], 3)
-            # print("Translation: Tx: {0}, Ty: {1}, Tz {2}, Timestamp: {3}\n".format(tx, ty, tz, zed_pose.timestamp.get_milliseconds()))
-
-            # Display the orientation quaternion
-            py_orientation = sl.Orientation()
-            ox = round(zed_pose.get_orientation(py_orientation).get()[0], 3)
-            oy = round(zed_pose.get_orientation(py_orientation).get()[1], 3)
-            oz = round(zed_pose.get_orientation(py_orientation).get()[2], 3)
-            ow = round(zed_pose.get_orientation(py_orientation).get()[3], 3)
-            pose_lst=[tx,ty,tz,ow,ox,oy,oz]
-            process_key_event(zed, key,pose_lst)
+            process_key_event(zed, key,zed_pose, sl)
 
     cv2.destroyAllWindows()
     zed.close()
-
     print("\nFINISH")
 
 if __name__ == "__main__":
