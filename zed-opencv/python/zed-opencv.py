@@ -166,7 +166,7 @@ def process_key_event(zed, key,zed_pose, sl) :
         print("Point Cloud format: ", point_cloud_format_ext)
     elif key == 104 or key == 72:#h
         print(help_string)
-    elif key == 82:#R
+    elif key == 114 or  key == 82:#R
         print("create reconstruction datadd")
         for count_save in range(100):
             print(count_save)
@@ -176,9 +176,9 @@ def process_key_event(zed, key,zed_pose, sl) :
             filename=path+prefix_reconstruction+"-%06d.pose"%(count_save)
             df.to_csv(filename+'.txt',sep=' ',header=None,index=None)
             filename=path+prefix_reconstruction+"-%06d.depth"%(count_save)
-            save_depth(filename)
+            save_depth(zed,filename)
             filename=path+prefix_reconstruction+"-%06d.color"%(count_save)
-            save_sbs_image(filename + ".jpg")
+            save_sbs_image(zed,filename + ".jpg")
             time.sleep(2)
         count_save=0
     elif key == 115:#f4
