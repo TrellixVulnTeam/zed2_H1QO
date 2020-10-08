@@ -198,8 +198,8 @@ def process_key_event(zed, key,zed_pose, sl,image_zed,depth_image_zed,point_clou
                 filename=path+prefix_reconstruction+"-%06d.depth"%(count_save)
                 save_depth(zed,filename)
                 filename=path+prefix_reconstruction+"-%06d.color"%(count_save)
-                save_left_image(zed,filename + ".jpg")
-                cv2.imshow("Image", image_ocv)
+                image_ocv_left=save_left_image(zed,filename + ".jpg")
+                cv2.imshow("Image", image_ocv_left)
                 time.sleep(1)
         count_save=0
     elif key == 115:#f4
