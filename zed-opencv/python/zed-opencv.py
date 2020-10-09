@@ -10,7 +10,7 @@ from transforms3d.quaternions import quat2mat, mat2quat
 help_string = "[s] Save side by side image [d] Save Depth, [n] Change Depth format, [p] Save Point Cloud, [m] Change Point Cloud format, [q] Quit"
 prefix_point_cloud = "Cloud_"
 prefix_depth = "Depth_"
-prefix_reconstruction = "reconstruction"
+prefix_reconstruction = "1_reconstruction"
 path = "./data/"
 
 count_save = 0
