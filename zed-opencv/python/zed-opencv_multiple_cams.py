@@ -50,24 +50,6 @@ def depth_format_name():
         2: ".pgm",
     }
     return switcher.get(mode_depth, "nothing") 
-
-# def save_tracing_dt(zed,filename,camera_pose,py_translation) :
-#     tracking_state = zed.get_position(camera_pose)
-#     if tracking_state == sl.POSITIONAL_TRACKING_STATE.OK:
-#         # rotation = camera_pose.get_rotation_vector()
-#         rotation = camera_pose.get_orientation()
-#         rx=rotation[0]
-#         ry=rotation[1]
-#         rz=rotation[3]
-#         ro=rotation[4]
-#         translation = camera_pose.get_translation(py_translation)
-#         tx = translation.get()[0]
-#         ty = translation.get()[1]
-#         tz = translation.get()[2]
-#         pose_lst=[tx,ty,tz,rx,ry,rz,ro]
-#         df=pd.DataFrame(pose_lst)
-#         df.to_csv(filename+'.csv',header=None, index=None)
-
 def get_pos_dt(zed, zed_pose, zed_sensors,sl):
     #https://github.com/stereolabs/zed-examples/blob/master/tutorials/tutorial%204%20-%20positional%20tracking/python/positional_tracking.py
     zed.get_position(zed_pose, sl.REFERENCE_FRAME.WORLD)
@@ -156,7 +138,6 @@ def process_key_event(zed, key,zed_pose, zed_sensors,sl,image_zed,depth_image_ze
     global count_save
     global depth_format_ext
     global point_cloud_format_ext
-    global key_flg, key_last_no
 
     if key == 100 or key == 68: #d
         save_depth(zed, path + prefix_depth + str(count_save))
@@ -178,6 +159,7 @@ def process_key_event(zed, key,zed_pose, zed_sensors,sl,image_zed,depth_image_ze
     elif key == 104 or key == 72:#h
         print(help_string)
     elif key == 114 or  key == 82:#R
+
         if count_save >100:
             key_flg=False
             key_last_no=0
