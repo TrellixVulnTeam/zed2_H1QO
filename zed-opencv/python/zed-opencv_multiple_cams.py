@@ -241,6 +241,7 @@ def main() :
     global thread_list
     global zed_pose_list
     global zed_sensors_list
+    global count_save
     signal.signal(signal.SIGINT, signal_handler)
     # List and open cameras
     name_list = []
