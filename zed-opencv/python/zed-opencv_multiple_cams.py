@@ -174,6 +174,8 @@ def process_key_event(zed, key,zed_pose, zed_sensors,name_cam):
     global count_save
     global depth_format_ext
     global point_cloud_format_ext
+    global key_flg
+    global key_last_no
 
     if key == 100 or key == 68: #d
         save_depth(zed, path + prefix_depth + str(count_save))
@@ -195,7 +197,6 @@ def process_key_event(zed, key,zed_pose, zed_sensors,name_cam):
     elif key == 104 or key == 72:#h
         print(help_string)
     elif key == 114 or  key == 82:#R
-
         if count_save >100:
             key_flg=False
             key_last_no=0
@@ -214,8 +215,6 @@ def process_key_event(zed, key,zed_pose, zed_sensors,name_cam):
             filename = path + name_cam+'-'+ prefix_reconstruction + "-%06d.color" % (count_save)
             image_ocv_left = save_left_image(zed, filename + ".jpg")
             # cv2.imshow("Image", image_ocv_left)
-            count_save += 1
-            time.sleep(0.5)
     elif key == 115:#f4
         save_sbs_image(zed, "ZED_image" + str(count_save) + ".jpg")
         count_save += 1
@@ -356,6 +355,8 @@ def main() :
         key = cv2.waitKey(10)
         if key_flg:
             key=key_last_no
+            count_save += 1
+            time.sleep(0.5)
         index=0
         for cam in cameras:
             process_key_event(zed_list[index], key,zed_pose_list[index], zed_sensors_list[index],name_list[index])
