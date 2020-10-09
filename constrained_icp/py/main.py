@@ -10,7 +10,7 @@ file_id_start =0
 file_id_stop = 8
 
 voxel_size = 0.01
-max_point_depth = 10000
+max_point_depth = 5000
 # max_point_depth = 2
 icp_dist_coarse = voxel_size * 15
 icp_dist_fine = voxel_size * 5
@@ -22,13 +22,15 @@ def main():
     poses=[]
     for i in range(file_id_start, file_id_stop + 1, 1):
         # pcd_file = './data/pcd_%d.pcd' % (i)
-        pcd_file='C:/00_work/05_src/zed2/zed-opencv/python/Cloud_%d.pcd' % (i)
+        pcd_file='C:/00_work/05_src/zed2/zed-opencv/python/data/Cloud_%d.pcd' % (i)
         print("Reading %s..."%(pcd_file))
         pcd = o3d.io.read_point_cloud(pcd_file)
         pcds.append(pcd)
-        pose_file='C:/00_work/05_src/zed2/zed-opencv/python/Cloud_%d.csv' % (i)
+        pose_file='C:/00_work/05_src/zed2/zed-opencv/python/data/Cloud_%d.csv' % (i)
         df=pd.read_csv(pose_file,header=None)
-        poses.append(df.values.tolist()[0])
+        pose=df.values.tolist()[0]
+        # pose[0:3]=np.divide(pose[0:3],1000)
+        poses.append(pose)
 
     pcds = crop_clouds_by_depth(pcds, max_point_depth)
     pcds = remove_clouds_outliers(pcds, 30, voxel_size, 1)  # removing outliers before downsample give good result.

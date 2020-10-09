@@ -18,6 +18,8 @@ mode_point_cloud = 0
 mode_depth = 0
 point_cloud_format_ext = ".ply"
 depth_format_ext = ".png"
+key_flg=False
+key_last_no=0
 def translations_quaternions_to_transform(pose):
     t = pose[:3]
     q = pose[3:]
@@ -66,10 +68,11 @@ def depth_format_name():
 #         df=pd.DataFrame(pose_lst)
 #         df.to_csv(filename+'.csv',header=None, index=None)
 
-def get_pos_dt(zed, zed_pose, sl):
+def get_pos_dt(zed, zed_pose, zed_sensors,sl):
+    #https://github.com/stereolabs/zed-examples/blob/master/tutorials/tutorial%204%20-%20positional%20tracking/python/positional_tracking.py
     zed.get_position(zed_pose, sl.REFERENCE_FRAME.WORLD)
-    # zed.get_sensors_data(zed_sensors, sl.TIME_REFERENCE.IMAGE)
-    # zed_imu = zed_sensors.get_imu_data()  # Display the translation and timestamp
+    zed.get_sensors_data(zed_sensors, sl.TIME_REFERENCE.IMAGE)
+    zed_imu = zed_sensors.get_imu_data()  # Display the translation and timestamp
     py_translation = sl.Translation()
     tx = round(zed_pose.get_translation(py_translation).get()[0], 3)
     ty = round(zed_pose.get_translation(py_translation).get()[1], 3)
@@ -147,7 +150,7 @@ def get_camera_intrintic_info(zed):
         [0, 0,  1]
     ]
     return k
-def process_key_event(zed, key,zed_pose, sl,image_zed,depth_image_zed,point_cloud,image_size,runtime):
+def process_key_event(zed, key,zed_pose, zed_sensors,sl,image_zed,depth_image_zed,point_cloud,image_size,runtime):
     global mode_depth
     global mode_point_cloud
     global count_save
@@ -164,7 +167,7 @@ def process_key_event(zed, key,zed_pose, sl,image_zed,depth_image_zed,point_clou
     elif key == 112 or key == 80:#p
         filename=path + prefix_point_cloud + str(count_save)
         save_point_cloud(zed, filename)
-        pose_lst=get_pos_dt(zed, zed_pose, sl)
+        pose_lst=get_pos_dt(zed, zed_pose,zed_sensors, sl)
         export_list_csv(pose_lst, filename + '.csv')
         count_save += 1
     elif key == 109 or key == 77:#m
@@ -174,39 +177,32 @@ def process_key_event(zed, key,zed_pose, sl,image_zed,depth_image_zed,point_clou
     elif key == 104 or key == 72:#h
         print(help_string)
     elif key == 114 or  key == 82:#R
-        print("create reconstruction datadd")
-        for count_save in range(100):
+
+        if count_save >100:
+            key_flg=False
+            key_last_no=0
+            count_save=0
+        else:
+            key_last_no=key
+            key_flg=True
             print(count_save)
-            err = zed.grab(runtime)
-            if err == sl.ERROR_CODE.SUCCESS :
-                # Retrieve the left image, depth image in the half-resolution
-                zed.retrieve_image(image_zed, sl.VIEW.LEFT, sl.MEM.CPU, image_size)
-                zed.retrieve_image(depth_image_zed, sl.VIEW.DEPTH, sl.MEM.CPU, image_size)
-                # Retrieve the RGBA point cloud in half resolution
-                zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.CPU, image_size)
-
-                # To recover data from sl.Mat to use it with opencv, use the get_data() method
-                # It returns a numpy array that can be used as a matrix with opencv
-                image_ocv = image_zed.get_data()
-                depth_image_ocv = depth_image_zed.get_data()
-
-                pose_lst=get_pos_dt(zed, zed_pose, sl)
-                translation=translations_quaternions_to_transform(pose_lst)
-                df=pd.DataFrame(translation)
-                filename=path+prefix_reconstruction+"-%06d.pose"%(count_save)
-                df.to_csv(filename+'.txt',sep=' ',header=None,index=None)
-                filename=path+prefix_reconstruction+"-%06d.depth"%(count_save)
-                save_depth(zed,filename)
-                filename=path+prefix_reconstruction+"-%06d.color"%(count_save)
-                image_ocv_left=save_left_image(zed,filename + ".jpg")
-                cv2.imshow("Image", image_ocv_left)
-                time.sleep(1)
-        count_save=0
+            pose_lst = get_pos_dt(zed, zed_pose, sl)
+            translation = translations_quaternions_to_transform(pose_lst)
+            df = pd.DataFrame(translation)
+            filename = path + prefix_reconstruction + "-%06d.pose" % (count_save)
+            df.to_csv(filename + '.txt', sep=' ', header=None, index=None)
+            filename = path + prefix_reconstruction + "-%06d.depth" % (count_save)
+            save_depth(zed, filename)
+            filename = path + prefix_reconstruction + "-%06d.color" % (count_save)
+            image_ocv_left = save_left_image(zed, filename + ".jpg")
+            cv2.imshow("Image", image_ocv_left)
+            count_save += 1
+            time.sleep(0.5)
     elif key == 115:#f4
         save_sbs_image(zed, "ZED_image" + str(count_save) + ".jpg")
         count_save += 1
     else:
-        a = 0
+        pass
 
 def print_help() :
     print(" Press 's' to save Side by side images")
@@ -230,7 +226,7 @@ def main() :
     # init.camera_resolution = sl.RESOLUTION.HD720
     init.camera_resolution = sl.RESOLUTION.VGA
     init.depth_mode = sl.DEPTH_MODE.PERFORMANCE
-    init.coordinate_units = sl.UNIT.MILLIMETER
+    init.coordinate_units = sl.UNIT.METER
     # Open the camera
     err = zed.open(init)
     if err != sl.ERROR_CODE.SUCCESS :
@@ -286,7 +282,9 @@ def main() :
             cv2.imshow("Depth", depth_image_ocv)
 
             key = cv2.waitKey(10)
-            process_key_event(zed, key,zed_pose, sl,image_zed,depth_image_zed,point_cloud,image_size,runtime)
+            if key_flg:
+                key=key_last_no
+            process_key_event(zed, key,zed_pose, zed_sensors,sl,image_zed,depth_image_zed,point_cloud,image_size,runtime)
 
     cv2.destroyAllWindows()
     zed.close()
