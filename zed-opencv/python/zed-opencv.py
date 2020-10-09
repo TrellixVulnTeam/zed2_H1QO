@@ -186,7 +186,7 @@ def process_key_event(zed, key,zed_pose, zed_sensors,sl,image_zed,depth_image_ze
             key_last_no=key
             key_flg=True
             print(count_save)
-            pose_lst = get_pos_dt(zed, zed_pose, sl)
+            pose_lst = get_pos_dt(zed, zed_pose,zed_sensors, sl)
             translation = translations_quaternions_to_transform(pose_lst)
             df = pd.DataFrame(translation)
             filename = path + prefix_reconstruction + "-%06d.pose" % (count_save)
