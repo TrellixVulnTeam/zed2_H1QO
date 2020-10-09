@@ -197,7 +197,7 @@ def process_key_event(zed, key,zed_pose, zed_sensors,name_cam):
     elif key == 104 or key == 72:#h
         print(help_string)
     elif key == 114 or  key == 82:#R
-        if count_save >100:
+        if count_save >4:
             key_flg=False
             key_last_no=0
             count_save=0
