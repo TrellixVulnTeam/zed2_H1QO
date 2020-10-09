@@ -87,32 +87,32 @@ def depth_format_name():
     }
     return switcher.get(mode_depth, "nothing") 
 def get_pos_dt(zed, zed_pose, zed_sensors):
+    cnt_r=6
     #https://github.com/stereolabs/zed-examples/blob/master/tutorials/tutorial%204%20-%20positional%20tracking/python/positional_tracking.py
     zed.get_position(zed_pose, sl.REFERENCE_FRAME.WORLD)
     zed.get_sensors_data(zed_sensors, sl.TIME_REFERENCE.IMAGE)
     zed_imu = zed_sensors.get_imu_data()  # Display the translation and timestamp
     py_translation = sl.Translation()
-    tx = round(zed_pose.get_translation(py_translation).get()[0], 3)
-    ty = round(zed_pose.get_translation(py_translation).get()[1], 3)
-    tz = round(zed_pose.get_translation(py_translation).get()[2], 3)
+    tx = round(zed_pose.get_translation(py_translation).get()[0], cnt_r)
+    ty = round(zed_pose.get_translation(py_translation).get()[1], cnt_r)
+    tz = round(zed_pose.get_translation(py_translation).get()[2], cnt_r)
     # print("Translation: Tx: {0}, Ty: {1}, Tz {2}, Timestamp: {3}\n".format(tx, ty, tz, zed_pose.timestamp.get_milliseconds()))
 
     # Display the orientation quaternion
     py_orientation = sl.Orientation()
-    ox = round(zed_pose.get_orientation(py_orientation).get()[0], 3)
-    oy = round(zed_pose.get_orientation(py_orientation).get()[1], 3)
-    oz = round(zed_pose.get_orientation(py_orientation).get()[2], 3)
-    ow = round(zed_pose.get_orientation(py_orientation).get()[3], 3)
+    ox = round(zed_pose.get_orientation(py_orientation).get()[0], cnt_r)
+    oy = round(zed_pose.get_orientation(py_orientation).get()[1], cnt_r)
+    oz = round(zed_pose.get_orientation(py_orientation).get()[2], cnt_r)
+    ow = round(zed_pose.get_orientation(py_orientation).get()[3], cnt_r)
     pose_lst = [tx, ty, tz, ow, ox, oy, oz]
     return pose_lst
-
 def export_list_csv(export_list, csv_dir):
 
     with open(csv_dir, "w") as f:
-        writer = csv.writer(f, lineterminator='\n')
+        writer = csv.writer(f, lineterminator='\n',delimiter=' ',)
 
         if isinstance(export_list[0], list): #多次元の場合
-            writer.writerows(export_list,delimiter=' ')
+            writer.writerows(export_list)
 
         else:
             writer.writerow(export_list)
@@ -206,13 +206,15 @@ def process_key_event(zed, key,zed_pose, zed_sensors,name_cam):
             key_flg=True
             print(count_save)
             pose_lst = get_pos_dt(zed, zed_pose,zed_sensors)
+            filename = path +prefix_reconstruction + "-%06d.tow"+'-'+ name_cam % (count_save)
+            export_list_csv(pose_lst, filename + '.csv')
             translation = translations_quaternions_to_transform(pose_lst)
             df = pd.DataFrame(translation)
-            filename = path + name_cam+'-'+prefix_reconstruction + "-%06d.pose" % (count_save)
+            filename = path + prefix_reconstruction + "-%06d.pose"+'-'+ name_cam % (count_save)
             df.to_csv(filename + '.txt', sep=' ', header=None, index=None)
-            filename = path + name_cam+'-'+ prefix_reconstruction + "-%06d.depth" % (count_save)
+            filename = path + prefix_reconstruction + "-%06d.depth"+'-'+ name_cam % (count_save)
             save_depth(zed, filename)
-            filename = path + name_cam+'-'+ prefix_reconstruction + "-%06d.color" % (count_save)
+            filename = path + prefix_reconstruction + "-%06d.color"+'-'+ name_cam % (count_save)
             image_ocv_left = save_left_image(zed, filename + ".jpg")
             # cv2.imshow("Image", image_ocv_left)
     elif key == 115:#f4
@@ -319,7 +321,6 @@ def main() :
         df = pd.DataFrame(cam_intr)
         df.to_csv(filename , sep=' ', header=None, index=None)
         index += 1
-
 
     key = ' '
     while key != 113 :

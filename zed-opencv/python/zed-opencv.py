@@ -74,10 +74,10 @@ def get_pos_dt(zed, zed_pose, zed_sensors,sl):
 def export_list_csv(export_list, csv_dir):
 
     with open(csv_dir, "w") as f:
-        writer = csv.writer(f, lineterminator='\n')
+        writer = csv.writer(f, lineterminator='\n',delimiter=' ',)
 
         if isinstance(export_list[0], list): #多次元の場合
-            writer.writerows(export_list,delimiter=' ')
+            writer.writerows(export_list)
 
         else:
             writer.writerow(export_list)
