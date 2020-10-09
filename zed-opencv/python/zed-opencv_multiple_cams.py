@@ -206,15 +206,15 @@ def process_key_event(zed, key,zed_pose, zed_sensors,name_cam):
             key_flg=True
             print(count_save)
             pose_lst = get_pos_dt(zed, zed_pose,zed_sensors)
-            filename = path +prefix_reconstruction + "-%06d.tow"+'-'+ name_cam % (count_save)
+            filename = path +prefix_reconstruction + "-%06d.tow"% (count_save)+'-'+ name_cam
             export_list_csv(pose_lst, filename + '.csv')
             translation = translations_quaternions_to_transform(pose_lst)
             df = pd.DataFrame(translation)
-            filename = path + prefix_reconstruction + "-%06d.pose"+'-'+ name_cam % (count_save)
+            filename = path + prefix_reconstruction + "-%06d.pose"% (count_save)+'-'+ name_cam
             df.to_csv(filename + '.txt', sep=' ', header=None, index=None)
-            filename = path + prefix_reconstruction + "-%06d.depth"+'-'+ name_cam % (count_save)
+            filename = path + prefix_reconstruction + "-%06d.depth"% (count_save)+'-'+ name_cam
             save_depth(zed, filename)
-            filename = path + prefix_reconstruction + "-%06d.color"+'-'+ name_cam % (count_save)
+            filename = path + prefix_reconstruction + "-%06d.color"% (count_save)+'-'+ name_cam
             image_ocv_left = save_left_image(zed, filename + ".jpg")
             # cv2.imshow("Image", image_ocv_left)
     elif key == 115:#f4
