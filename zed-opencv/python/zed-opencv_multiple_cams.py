@@ -8,7 +8,8 @@ import threading
 import time
 import signal
 from transforms3d.quaternions import quat2mat, mat2quat
-
+#https://github.com/stereolabs/zed-examples/blob/master/tutorials/tutorial%204%20-%20positional%20tracking/python/positional_tracking.py
+#https://github.com/stereolabs/zed-multi-camera/blob/master/python/multi_camera.py
 help_string = "[s] Save side by side image [d] Save Depth, [n] Change Depth format, [p] Save Point Cloud, [m] Change Point Cloud format, [q] Quit"
 prefix_point_cloud = "Cloud_"
 prefix_depth = "Depth_"
@@ -257,7 +258,8 @@ def main() :
         input_type.set_from_svo_file(sys.argv[1])
     init = sl.InitParameters(input_t=input_type)
     # init.camera_resolution = sl.RESOLUTION.HD720
-    init.camera_resolution = sl.RESOLUTION.VGA
+    # init.camera_resolution = sl.RESOLUTION.VGA
+    init.camera_resolution = sl.RESOLUTION.HD2K
     init.depth_mode = sl.DEPTH_MODE.PERFORMANCE
     init.coordinate_units = sl.UNIT.METER
 
