@@ -227,10 +227,12 @@ def process_key_event(zed, key,zed_pose, zed_sensors,name_cam):
     else:
         pass
 def get_pose_transform_matrix(zed):
-  if zed.cam.get_position(zed.mat.pose) == \
-      sl.POSITIONAL_TRACKING_STATE.OK:
-    zed.mat.pose.pose_data(zed.mat.transform)
-  return zed.mat.transform.m
+  # if zed.cam.get_position(zed.mat.pose) == \
+  #     sl.POSITIONAL_TRACKING_STATE.OK:
+  #   zed.mat.pose.pose_data(zed.mat.transform)
+  if zed.get_position(sl.pose())==sl.POSITIONAL_TRACKING_STATE.OK:
+      zed.pose().pose_data(sl.transform)
+  return sl.transform.m
 def print_help() :
     print(" Press 's' to save Side by side images")
     print(" Press 'p' to save Point Cloud")
