@@ -206,6 +206,9 @@ def process_key_event(zed, key,zed_pose, zed_sensors,name_cam):
             key_last_no=key
             key_flg=True
             print(count_save)
+            posetransform=get_pose_transform_matrix(zed)
+            filename = path +prefix_reconstruction + "-%06d.tran"% (count_save)+'-'+ name_cam
+            export_list_csv(posetransform, filename + '.csv')
             pose_lst = get_pos_dt(zed, zed_pose,zed_sensors)
             filename = path +prefix_reconstruction + "-%06d.tow"% (count_save)+'-'+ name_cam
             export_list_csv(pose_lst, filename + '.csv')
@@ -223,7 +226,11 @@ def process_key_event(zed, key,zed_pose, zed_sensors,name_cam):
         count_save += 1
     else:
         pass
-
+def get_pose_transform_matrix(zed):
+  if zed.cam.get_position(zed.mat.pose) == \
+      sl.POSITIONAL_TRACKING_STATE.OK:
+    zed.mat.pose.pose_data(zed.mat.transform)
+  return zed.mat.transform.m
 def print_help() :
     print(" Press 's' to save Side by side images")
     print(" Press 'p' to save Point Cloud")
@@ -258,8 +265,8 @@ def main() :
         input_type.set_from_svo_file(sys.argv[1])
     init = sl.InitParameters(input_t=input_type)
     # init.camera_resolution = sl.RESOLUTION.HD720
-    # init.camera_resolution = sl.RESOLUTION.VGA
-    init.camera_resolution = sl.RESOLUTION.HD2K
+    init.camera_resolution = sl.RESOLUTION.VGA
+    # init.camera_resolution = sl.RESOLUTION.HD2K
     init.depth_mode = sl.DEPTH_MODE.PERFORMANCE
     init.coordinate_units = sl.UNIT.METER
 
