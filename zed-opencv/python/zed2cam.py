@@ -9,8 +9,7 @@ from enum import IntEnum
 # https://learn.adafruit.com/adafruit-sensorlab-magnetometer-calibration/magnetic-calibration-with-jupyter
 
 verbose = True
-
-save_dir = "data_zed2"
+save_dir = "data/20201012144925"
 
 class TakeMode(IntEnum):
   RGB = 0

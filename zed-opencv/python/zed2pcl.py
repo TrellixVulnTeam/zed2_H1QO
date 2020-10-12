@@ -1,9 +1,8 @@
 import numpy as np
-import os, open3d, quaternion, functools, itertools, struct, time
+# import os, open3d, quaternion, functools, itertools, struct, time
+import os, open3d,  functools, itertools, struct, time
 import vectormath as vmath
 
-base_dir = "G:/マイドライブ/00_work/zed_dt/Zed2/"
-data_dir = os.path.join(base_dir, '20200928')
 verbose=True
 
 def stop_watch(func) :
@@ -48,7 +47,7 @@ def calcurate_xyz(color, depth, intr):
     colors.append(rgb)
     #colors.append((color[u, v][:3]).astype(np.uint8))
   pcd = make_pcd(np.array(points), colors)
-  return pcd if not verbose else pcd, points, colors
+  return pcd #if not verbose else pcd, points, colors
 
 def create_pcd_from_float_depth(menu):
   # ZED2 cam returns depth map with float32, 
@@ -59,11 +58,10 @@ def create_pcd_from_float_depth(menu):
   window = menu.frames[menu.cam_id]['window']
   color = convert_bgra2rgba(color)
   if menu.option.with_frame and (np.array(window) != None).all():
-    color, depth, depth_med = add_frame2img( color, depth,window)
+    color, depth, depth_med = add_frame2img(menu, color, depth)
     if menu.frames != None:
       menu.frames[menu.cam_id].depth_med = depth_med
-  intr=menu.config['RESOLUTION.HD720']
-  pcd = calcurate_xyz( color, depth,intr)
+  pcd = calcurate_xyz(menu, color, depth)
   if menu.option.correction:
     pass
   return pcd
@@ -158,33 +156,41 @@ def find_plane_from_pcd(pcd):
   param = np.r_[nv, -np.mean(ds)]
   return param
 
-def float2rgba(f):
+def zed_depthfloat_to_abgr(f):
+  """
+    ZED pcd data format:
+      ----------------------------------------------------------
+      https://www.stereolabs.com/docs/depth-sensing/using-depth/
+      ----------------------------------------------------------
+      The point cloud stores its data on 4 channels using 32-bit 
+      float for each channel. 
+      The last float is used to store color information, where 
+      R, G, B, and alpha channels (4 x 8-bit) are concatenated 
+      into a single 32-bit float. 
+  """
   # https://stackoverflow.com/questions/23624212/how-to-convert-a-float-into-hex/38879403
   h = hex(struct.unpack('<I', struct.pack('<f', f))[0])
   return [eval('0x'+a+b) for a, b in zip(h[::2], h[1::2]) if a+b != '0x']
 
 # https://takala.tokyo/takala_wp/2018/11/28/736/
-# np_float2uint8arr = np.frompyfunc(float2uint8arr, 1, 1)
+np_zed_depthfloat_to_abgr = np.frompyfunc(zed_depthfloat_to_abgr, 1, 1)
 
 @stop_watch
-def convert_zed2pcd_to_ply(pcd):
-  zed_points = pcd[:,:,:3]
-  zed_colors = pcd[:,:,3]
+def convert_zed2pcd_to_ply(zed_pcd):
+  zed_points = zed_pcd[:,:,:3]
+  zed_colors = zed_pcd[:,:,3]
   points, colors = [], []
   for x, y in itertools.product(
     [a for a in range(zed_colors.shape[0])],
     [a for a in range(zed_colors.shape[1])]):
-    tmp = float2rgba(zed_colors[x, y])
-    tmp = [tmp[3], tmp[2], tmp[1], tmp[0]] # ABGR to RGBA
+    if np.isinf(zed_points[x, y]).any() or  np.isnan(zed_points[x, y]).any():
+      continue
+    # color
+    tmp = zed_depthfloat_to_abgr(zed_colors[x, y])
+    tmp = [tmp[3], tmp[2], tmp[1]] # ABGR to RGB
+    tmp = np.array(tmp).astype(np.float64) / 255. # for ply (color is double)
     colors.append(tmp)
-    points.append(zed_points[x, y])
-  # for ply format. (color is double)
-  colors = np.array(colors).astype(np.float32) / 255. 
-  points = np.array(points)
-  #return make_pcd(points, colors)
-  return points, colors
-
-def unit_test():
-  f = 'c:/Users/003420/Desktop/Works/NICT/predevelopment/Zed2/data/20201007191310/pcd.npy'
-  zed_pcd = np.load(f)
-  return convert_zed2pcd_to_ply(zed_pcd)
+    # point
+    tmp = np.array(zed_points[x, y]).astype(np.float64) 
+    points.append(tmp)
+  return make_pcd(points, colors)
