@@ -9,7 +9,7 @@ from enum import IntEnum
 # https://learn.adafruit.com/adafruit-sensorlab-magnetometer-calibration/magnetic-calibration-with-jupyter
 
 verbose = True
-save_dir = "c:/Users/003420/Desktop/Works/NICT/predevelopment/Zed2/data"
+save_dir = "data/20201012144925"
 
 class TakeMode(IntEnum):
   RGB = 0
@@ -139,7 +139,6 @@ def init(menu):
   zed = init_params()
   if not zed.cam.is_opened():
     status = zed.cam.open(zed.param.init)
-    zed.cam.enable_positional_tracking(zed.param.tracking)
     if status != sl.ERROR_CODE.SUCCESS :
       print(repr(status))
       zed.cam.close()
@@ -147,22 +146,11 @@ def init(menu):
   menu.zed = zed
   return menu
 
-@stop_watch
 def get_pose_transform_matrix(menu):
-  if menu.zed.cam.grab(menu.zed.param.runtime) ==  sl.ERROR_CODE.SUCCESS:
-    while menu.zed.cam.get_position(menu.zed.mat.pose) != \
-      sl.POSITIONAL_TRACKING_STATE.OK:
-      stat = menu.zed.cam.grab(menu.zed.param.runtime)
-      if menu.zed.cam.get_position(menu.zed.mat.pose) == sl.POSITIONAL_TRACKING_STATE.OK:
-        break
-      if time.time()-st > 1.:
-        break
   if menu.zed.cam.get_position(menu.zed.mat.pose) == \
       sl.POSITIONAL_TRACKING_STATE.OK:
-    transform = menu.zed.mat.pose.pose_data(menu.zed.mat.transform)
-    rotation = menu.zed.mat.pose.get_rotation_vector()
-    translation = menu.zed.mat.pose.get_translation(menu.zed.mat.translation).get()
-  return EasyDict({'transform':transform.m, 'rot':rotation, 'translation':translation})
+    menu.zed.mat.pose.pose_data(menu.zed.mat.transform)
+  return menu.zed.mat.transform.m
 
 @stop_watch
 def take(menu):
@@ -187,7 +175,7 @@ def take(menu):
       print(f"data get: {(time.time() - st)}[sec]")
     # --------- retain data --------------
     zed.dat = EasyDict({'imu': {}, 'mag':{}, 'temp':{}, 'baro':{}})
-    zed.pose = get_pose_transform_matrix(menu)
+    zed.pose_transform_mat = get_pose_transform_matrix(menu)
     d = zed.mat.sensors
     # imu
     data = d.get_imu_data()
@@ -229,10 +217,8 @@ def save(menu):
   os.makedirs(p, exist_ok=True)
   if 'dat' in zed:
     json.dump(zed.dat, open(f"{p}/sensor.json", "w"), indent=2)
-  if 'pose' in zed:
-    np.save(f"{p}/transform.npy", zed.pose.transform)
-    np.save(f"{p}/rotation.npy", zed.pose.rot)
-    np.save(f"{p}/translation.npy", zed.pose.translation)
+  if 'pose_transform_mat' in zed:
+    np.save(f"{p}/pose_transform.npy", zed.pose_transform_mat)
   if menu.take.color:
     np.save(f"{p}/image.npy", zed.mat.image.get_data())
   if menu.take.depth:
