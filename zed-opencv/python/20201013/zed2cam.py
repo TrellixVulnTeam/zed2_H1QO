@@ -54,7 +54,6 @@ def all_done():
        menu.zed.cam.close()
   del menu
   print('proc done.')
-atexit.register(all_done)
 
 def stop_watch(func) :
   @functools.wraps(func)
