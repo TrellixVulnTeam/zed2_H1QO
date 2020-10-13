@@ -4,19 +4,16 @@ import numpy as np
 import zed2pcl, json, open3d
 
 
-f='C:/00_work/05_src/zed2/zed-opencv/python/data_1012/ZED_21888201-camera-intrinsics.txt'
 
 # VGAでの撮影。
 res = "RESOLUTION.VGA"
 config ="config/zed2cam.json"
 # intr = EasyDict(json.load(open(config))[res])
-f='C:/00_work/05_src/zed2/zed-opencv/python/data_1012/ZED_21888201-camera-intrinsics.txt'
-
 
 files = [
- "data_1012/pos1/reconstruction-000000.color-ZED_21888201.jpg",
- "data_1012/pos1/reconstruction-000000.depth-ZED_21888201.png",
- "data_1012/ZED_21888201-camera-intrinsics.txt"]
+ "data_1013_1/reconstruction-000000.color-ZED_21888201.jpg",
+ "data_1013_1/reconstruction-000000.depth-ZED_21888201.png",
+ "data_1013_1/ZED_21888201-camera-intrinsics.txt"]
 color = np.array(Image.open(files[0]))
 depth = np.array(Image.open(files[1]))
 k=np.loadtxt(files[2])

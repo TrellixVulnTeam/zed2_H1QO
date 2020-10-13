@@ -198,7 +198,7 @@ def process_key_event(zed, key,zed_pose, zed_sensors,name_cam):
     elif key == 104 or key == 72:#h
         print(help_string)
     elif key == 114 or  key == 82:#R
-        if count_save >4:
+        if count_save >1 and 0:
             key_flg=False
             key_last_no=0
             count_save=0
@@ -206,9 +206,9 @@ def process_key_event(zed, key,zed_pose, zed_sensors,name_cam):
             key_last_no=key
             key_flg=True
             print(count_save)
-            posetransform=get_pose_transform_matrix(zed)
-            filename = path +prefix_reconstruction + "-%06d.tran"% (count_save)+'-'+ name_cam
-            export_list_csv(posetransform, filename + '.csv')
+            # posetransform=get_pose_transform_matrix(zed)
+            #filename = path +prefix_reconstruction + "-%06d.tran"% (count_save)+'-'+ name_cam
+            #export_list_csv(posetransform, filename + '.csv')
             pose_lst = get_pos_dt(zed, zed_pose,zed_sensors)
             filename = path +prefix_reconstruction + "-%06d.tow"% (count_save)+'-'+ name_cam
             export_list_csv(pose_lst, filename + '.csv')
@@ -221,6 +221,7 @@ def process_key_event(zed, key,zed_pose, zed_sensors,name_cam):
             filename = path + prefix_reconstruction + "-%06d.color"% (count_save)+'-'+ name_cam
             image_ocv_left = save_left_image(zed, filename + ".jpg")
             # cv2.imshow("Image", image_ocv_left)
+            #count_save+=1
     elif key == 115:#f4
         save_sbs_image(zed, "ZED_image" + str(count_save) + ".jpg")
         count_save += 1
@@ -253,6 +254,8 @@ def main() :
     global thread_list
     global zed_pose_list
     global zed_sensors_list
+    global key_flg
+    global key_last_no
     global count_save
     signal.signal(signal.SIGINT, signal_handler)
     # List and open cameras
@@ -367,9 +370,10 @@ def main() :
 
         key = cv2.waitKey(10)
         if key_flg:
-            key=key_last_no
+            #key=key_last_no
             count_save += 1
             time.sleep(0.5)
+            key_flg=False
         index=0
         for cam in cameras:
             process_key_event(zed_list[index], key,zed_pose_list[index], zed_sensors_list[index],name_list[index])
