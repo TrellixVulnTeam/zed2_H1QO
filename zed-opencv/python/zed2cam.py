@@ -10,7 +10,6 @@ from enum import IntEnum
 
 verbose = True
 save_dir = "data"
-
 class TakeMode(IntEnum):
   RGB = 0
   RGBD = 1
