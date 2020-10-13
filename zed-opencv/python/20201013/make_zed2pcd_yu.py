@@ -17,7 +17,6 @@ files = [
  "data_1012/pos1/reconstruction-000000.color-ZED_21888201.jpg",
  "data_1012/pos1/reconstruction-000000.depth-ZED_21888201.png",
  "data_1012/ZED_21888201-camera-intrinsics.txt"]
-intr=np.load(files[3])
 color = np.array(Image.open(files[0]))
 depth = np.array(Image.open(files[1]))
 k=np.loadtxt(files[2])
