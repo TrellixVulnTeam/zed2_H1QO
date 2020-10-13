@@ -1,6 +1,8 @@
 import numpy as np
-import os, open3d, quaternion, functools, itertools, struct, time
+import os, open3d,  functools, itertools, struct, time
 import vectormath as vmath
+from easydict import EasyDict
+import zed2cam
 
 verbose=True
 

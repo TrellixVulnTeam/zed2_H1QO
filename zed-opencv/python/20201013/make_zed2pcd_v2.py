@@ -4,7 +4,8 @@ menu = zed2cam.init(zed2cam.menu)
 menu = zed2cam.switch_take_mode(menu, zed2cam.TakeMode.RGBD)
 menu = zed2cam.take(menu)
 
-save_dir = 'data/20201012144925'
+
+save_dir = 'data/20201013095439'
 
 color = np.load(f'{save_dir}/image.npy')
 depth = np.load(f'{save_dir}/depth.npy')
