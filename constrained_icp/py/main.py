@@ -22,7 +22,7 @@ def main():
     poses=[]
     for i in range(file_id_start, file_id_stop + 1, 1):
         # pcd_file = './data/pcd_%d.pcd' % (i)
-        pcd_file='C:/00_work/05_src/zed2/zed-opencv/python/data/Cloud_%d.pcd' % (i)
+        pcd_file='data/pcd_%d.pcd' % (i)
         print("Reading %s..."%(pcd_file))
         pcd = o3d.io.read_point_cloud(pcd_file)
         pcds.append(pcd)
