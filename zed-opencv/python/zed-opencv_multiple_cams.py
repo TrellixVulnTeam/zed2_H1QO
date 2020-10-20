@@ -107,7 +107,7 @@ def get_pos_dt(zed, zed_pose, zed_sensors):
     ow = round(zed_pose.get_orientation(py_orientation).get()[3], cnt_r)
     pose_lst = [tx, ty, tz, ow, ox, oy, oz]
     # get camera transform data
-    R = zed_pose.get_rotation_matrix(sl.Rotation()).r.T
+    R = zed_pose.get_rotation_matrix(sl.Rotation()).r.T/1000
     t = zed_pose.get_translation(sl.Translation()).get()
     world2cam = np.hstack((R, np.dot(-R, t).reshape(3, -1)))
     K=get_camera_intrintic_info(zed)
