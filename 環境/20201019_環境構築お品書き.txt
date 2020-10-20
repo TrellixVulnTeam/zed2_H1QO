@@ -1,0 +1,45 @@
+
+* sshデーモンのインストールとsystemctl設定
+	<https://qiita.com/daikidomon/items/bc210a3e09ee3dd0fc1a>
+
+* nvidia-driver (version 450以上)のインストール
+	<https://qiita.com/yto1292/items/463e054943f3076f36cc>
+	
+	※ 初回起動時に黒画面ならば、以下を実施しCUIモードに切り替えること。
+		http://at284km.hatenablog.com/entry/2015/02/24/230239
+		
+		それでもNGなら、ワタケンに相談。
+	
+* cuda 11.1のインストール
+
+	<https://note.com/altbridgetech/n/ne5a320213280>
+	
+	説明は11.0なので、11.1に読み替えて実施。
+	(11.0のインストールをしないように注意。)
+
+* minicondaインストール
+
+	<https://varhowto.com/install-miniconda-ubuntu-20-04/>
+
+* zed2環境の作成
+
+	conda create -n zed2 python=3.7
+
+* zed2環境パッケージインストール
+
+	conda install -c anaconda tensorflow-gpu
+	conda install -c anaconda scipy
+	conda install -c conda-forge quaternion
+	conda install -c conda-forge jupyter
+	conda install -c conda-forge cython
+	conda install -c conda-forge pyopengl
+	conda install -c conda-forge opencv
+
+* zed2環境でpyzed 3.2.2のインストール("conda activate zed2"を実施)
+	
+	* pyzed 3.2.2 for ubuntu 20.04
+	wget https://download.stereolabs.com/zedsdk/3.2/cu110/ubuntu20
+	
+	<https://www.stereolabs.com/docs/app-development/python/install/>
+	※ conda環境にインストールするので、pipは実行しない
+

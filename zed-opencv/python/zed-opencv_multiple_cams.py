@@ -91,8 +91,8 @@ def get_pos_dt(zed, zed_pose, zed_sensors):
     cnt_r=6
     #https://github.com/stereolabs/zed-examples/blob/master/tutorials/tutorial%204%20-%20positional%20tracking/python/positional_tracking.py
     zed.get_position(zed_pose, sl.REFERENCE_FRAME.WORLD)
-    zed.get_sensors_data(zed_sensors, sl.TIME_REFERENCE.IMAGE)
-    zed_imu = zed_sensors.get_imu_data()  # Display the translation and timestamp
+    # zed.get_sensors_data(zed_sensors, sl.TIME_REFERENCE.IMAGE)
+    # zed_imu = zed_sensors.get_imu_data()  # Display the translation and timestamp
     py_translation = sl.Translation()
     tx = round(zed_pose.get_translation(py_translation).get()[0], cnt_r)
     ty = round(zed_pose.get_translation(py_translation).get()[1], cnt_r)
@@ -106,7 +106,14 @@ def get_pos_dt(zed, zed_pose, zed_sensors):
     oz = round(zed_pose.get_orientation(py_orientation).get()[2], cnt_r)
     ow = round(zed_pose.get_orientation(py_orientation).get()[3], cnt_r)
     pose_lst = [tx, ty, tz, ow, ox, oy, oz]
-    return pose_lst
+    # get camera transform data
+    R = zed_pose.get_rotation_matrix(sl.Rotation()).r.T
+    t = zed_pose.get_translation(sl.Translation()).get()
+    world2cam = np.hstack((R, np.dot(-R, t).reshape(3, -1)))
+    K=get_camera_intrintic_info(zed)
+    P = np.dot(K, world2cam)
+    transform = np.vstack((P, [0, 0, 0, 1]))
+    return pose_lst,transform
 def export_list_csv(export_list, csv_dir):
 
     with open(csv_dir, "w") as f:
@@ -209,19 +216,29 @@ def process_key_event(zed, key,zed_pose, zed_sensors,name_cam):
             # posetransform=get_pose_transform_matrix(zed)
             #filename = path +prefix_reconstruction + "-%06d.tran"% (count_save)+'-'+ name_cam
             #export_list_csv(posetransform, filename + '.csv')
-            pose_lst = get_pos_dt(zed, zed_pose,zed_sensors)
+            pose_lst,transform = get_pos_dt(zed, zed_pose,zed_sensors)
             filename = path +prefix_reconstruction + "-%06d.tow"% (count_save)+'-'+ name_cam
             export_list_csv(pose_lst, filename + '.csv')
+
+            df = pd.DataFrame(transform)
+            filename = path + prefix_reconstruction + "-%06d.trans"% (count_save)+'-'+ name_cam
+            df.to_csv(filename + '.csv', sep=' ', header=None, index=None)
+
             translation = translations_quaternions_to_transform(pose_lst)
             df = pd.DataFrame(translation)
             filename = path + prefix_reconstruction + "-%06d.pose"% (count_save)+'-'+ name_cam
-            df.to_csv(filename + '.txt', sep=' ', header=None, index=None)
+            df.to_csv(filename + '.csv', sep=' ', header=None, index=None)
+
             filename = path + prefix_reconstruction + "-%06d.depth"% (count_save)+'-'+ name_cam
             save_depth(zed, filename)
             filename = path + prefix_reconstruction + "-%06d.color"% (count_save)+'-'+ name_cam
             image_ocv_left = save_left_image(zed, filename + ".jpg")
             # cv2.imshow("Image", image_ocv_left)
             #count_save+=1
+            # filename = path + prefix_point_cloud + str(count_save)
+            filename = path + prefix_reconstruction + "-%06d.cloud" % (count_save) + '-' + name_cam
+            save_point_cloud(zed, filename)
+
     elif key == 115:#f4
         save_sbs_image(zed, "ZED_image" + str(count_save) + ".jpg")
         count_save += 1
@@ -271,7 +288,7 @@ def main() :
     init = sl.InitParameters(input_t=input_type)
     # init.camera_resolution = sl.RESOLUTION.HD720
     init.camera_resolution = sl.RESOLUTION.VGA
-    #init.camera_resolution = sl.RESOLUTION.HD2K
+    # init.camera_resolution = sl.RESOLUTION.HD2K
     init.depth_mode = sl.DEPTH_MODE.PERFORMANCE
     init.coordinate_units = sl.UNIT.METER
 

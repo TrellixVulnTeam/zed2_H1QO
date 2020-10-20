@@ -7,10 +7,10 @@ import pandas as pd
 # o3d = open3d
 
 file_id_start =0
-file_id_stop = 8
+file_id_stop = 2
 
 voxel_size = 0.01
-max_point_depth = 5000
+max_point_depth = 2000
 # max_point_depth = 2
 icp_dist_coarse = voxel_size * 15
 icp_dist_fine = voxel_size * 5
@@ -22,13 +22,13 @@ def main():
     poses=[]
     for i in range(file_id_start, file_id_stop + 1, 1):
         # pcd_file = './data/pcd_%d.pcd' % (i)
-        pcd_file='data/pcd_%d.pcd' % (i)
+        pcd_file='C:/00_work/05_src/zed2/zed-opencv/python/20201013/reconstruction-%06d.pcd-ZED_21888201.ply' % (i)
         print("Reading %s..."%(pcd_file))
         pcd = o3d.io.read_point_cloud(pcd_file)
         pcds.append(pcd)
-        pose_file='C:/00_work/05_src/zed2/zed-opencv/python/data/Cloud_%d.csv' % (i)
-        df=pd.read_csv(pose_file,header=None)
-        pose=df.values.tolist()[0]
+        pose_file='C:/00_work/05_src/zed2/zed-opencv/python/data_1013_1/reconstruction-%06d.tow-ZED_21888201.csv' % (i)
+        # df=pd.read_csv(pose_file,header=None)
+        pose=np.loadtxt(pose_file)
         # pose[0:3]=np.divide(pose[0:3],1000)
         poses.append(pose)
 
