@@ -287,8 +287,8 @@ def main() :
         input_type.set_from_svo_file(sys.argv[1])
     init = sl.InitParameters(input_t=input_type)
     # init.camera_resolution = sl.RESOLUTION.HD720
-    init.camera_resolution = sl.RESOLUTION.VGA
-    # init.camera_resolution = sl.RESOLUTION.HD2K
+    #init.camera_resolution = sl.RESOLUTION.VGA
+    init.camera_resolution = sl.RESOLUTION.HD2K
     init.depth_mode = sl.DEPTH_MODE.PERFORMANCE
     init.coordinate_units = sl.UNIT.METER
 
