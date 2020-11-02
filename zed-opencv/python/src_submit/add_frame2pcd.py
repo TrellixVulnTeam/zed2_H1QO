@@ -176,6 +176,10 @@ if __name__ == "__main__":
         fn='frame_'+id+'_mv.ply'
         open3d.io.write_point_cloud(fn, pyln)
     print(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),'e pcd_to_ply')
-    # fn = 'C:/00_work/05_src/data/' + ids[1] + '/pcd.npy'
-    # fnout = 'frame_'+ids[1]+'.ply'
-    # _test_add_frame_main(fn, frame, fnout)
+
+    # 赤枠を追加
+    '''
+    fn = 'C:/00_work/05_src/data/' + ids[1] + '/pcd.npy'
+    fnout = 'frame_'+ids[1]+'.ply'
+    _test_add_frame_main(fn, frame, fnout)
+    '''
