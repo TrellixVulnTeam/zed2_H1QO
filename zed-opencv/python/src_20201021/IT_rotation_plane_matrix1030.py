@@ -1,57 +1,44 @@
 import open3d,math as mt,numpy as np
-def vector_compute(v0, v1, axis=0):
-    return np.cross(v0, v1, axis=axis)
 
-def vector_normalize(data):
-    data = np.array(data, dtype=np.float64, copy=True)
-    return mt.sqrt(np.dot(data, data))
-def ang_two_vectors(v0, v1, directed=True, axis=0):
-    v0 = np.array(v0, dtype=np.float64, copy=False)
-    v1 = np.array(v1, dtype=np.float64, copy=False)
-    dot = np.sum(v0 * v1, axis=axis)
-    dot /= vector_normalize(v0) * vector_normalize(v1)
-    return np.arccos(dot if directed else np.fabs(dot))
+p = 'C:/00_work/05_src/data/frm_t/20201015155835'
+f = f"{p}/pcd_extracted.ply"
+pcd = open3d.io.read_point_cloud(f)
+points = np.copy(np.array(pcd.points))
+colors = np.copy(np.array(pcd.colors))
+def test_matrix(rotation_m,i):
+    pointsn=np.matmul(points,rotation_m)
+    pcd2 = open3d.geometry.PointCloud()
+    pcd2.points = open3d.utility.Vector3dVector(pointsn)
+    pcd2.colors = open3d.utility.Vector3dVector(colors)
+    open3d.io.write_point_cloud(f'{p}/pcd_extract_plane_rotation_m%03d.ply'%(i), pcd2)
 
-def unit_ch_vector(data, axis=None, out=None):
-    data = np.array(data, dtype=np.float64, copy=True)
-    data /= mt.sqrt(np.dot(data, data))
-    return data
-#https://ja.wikipedia.org/wiki/%E5%9B%9E%E8%BB%A2%E8%A1%8C%E5%88%97
-def get_rotation_matrix(ang, direct, point=None):
-    sina = mt.sin(ang)
-    cosa = mt.cos(ang)
-    direct = unit_ch_vector(direct[:3])
-    # rotation matrix around unit vector
-    R = np.diag([cosa, cosa, cosa])
-    R += np.outer(direct, direct) * (1.0 - cosa)
-    direct *= sina
-    R += np.array([[ 0.0,         -direct[2],  direct[1]],
-                      [ direct[2], 0.0,          -direct[0]],
-                      [-direct[1], direct[0],  0.0]])
-    M = np.identity(4)
-    M[:3, :3] = R
-    if point is not None:
-        # rotation not around origin
-        point = np.array(point[:3], dtype=np.float64, copy=False)
-        M[:3, 3] = point - np.dot(R, point)
-    return M
+rotation_m= [
+    [1,0.1,0.1],
+    [0,1,0],
+    [0,0.1,1]]
+test_matrix(rotation_m,1)
+rotation_m= [
+    [1,0.1,0.1],
+    [0,1,0.2],
+    [0,0.2,1]]
 
-vec20201015155844_z=[-0.0889259,-2.69011117,-1]
-vec20201015155844_y=[-0.0336802,-1,-0.3684832]
-vec20201015155844_x=[-1,-18.56481766,-6.71416052]
+test_matrix(rotation_m,2)
+# [0,0,1][[-2.8966267e-03  3.1407675e-04  1.0005289e+00]]
+rotation_m=[[-0.05013368 ,-0.073052 ,  -0.04055914],
+ [-0.2624987,  -0.12672341 ,-0.09770957],
+ [-0.06854045, -0.09249231, -0.04825318]]
+test_matrix(rotation_m,3)
 
-vec20201015155835_z=[-0.06199354,4.22205205,-1]
-vec20201015155835_y=[0.03323493,-1,0.00610331]
-vec20201015155835_x=[-1,19.77586931,-0.05332476]
-def rotaton_ply(p,v0,v1):
-    rotation_m = get_rotation_matrix(ang_two_vectors(v0, v1), vector_compute(v0, v1))
-    f = f"{p}/pcd_extracted.ply"
-    pcd = open3d.io.read_point_cloud(f)
-    print(rotation_m)
-    pcd_r=pcd.transform(rotation_m)
-    open3d.io.write_point_cloud(f'{p}/pcd_extract_plane_rotation.ply', pcd_r)
-v_dst=[0,1,0]
-# v_dst=vec20201015155835_y
-rotaton_ply('C:/00_work/05_src/data/frm_t/20201015155844',vec20201015155844_z,v_dst)
-rotaton_ply('C:/00_work/05_src/data/frm_t/20201015155835',vec20201015155835_y,v_dst)
 
+# [1,0,0][[ 0.78576213 -0.07347012 -0.03006236]]
+rotation_m= [[-0.02223897 , 0.00164234 ,-0.01287944],
+ [ 0.25433427,  0.01291677 , 0.7181615 ],
+ [ 0.4049464 , -0.00235477, -0.03856532]]
+
+test_matrix(rotation_m,4)
+
+# [0,1,0]
+rotation_m=[[-1.7241530e-04 ,-5.0471473e-02 , 1.1375386e-01],
+ [ 2.0281222e-01 , 1.4182341e-01 , 2.0452596e-01],
+ [ 3.7447242e-03, -9.1163673e-02, -2.9816501e-02]]
+test_matrix(rotation_m,5)

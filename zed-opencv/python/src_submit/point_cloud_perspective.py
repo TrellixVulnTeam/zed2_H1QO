@@ -1,11 +1,8 @@
 import os,itertools,json,open3d,struct
 import numpy as np
 from PIL import Image
-from easydict import EasyDict
 base_dir = 'C:/00_work/05_src/data'
 import cv2
-from move_pcds import move_pcds_by_frame,pcd_to_ply
-from outlier_detect import outlier_detection
 def convert_bgra2rgba(img):
   # ZED2 numpy color is BGRA.
   rgba = np.zeros(img.shape).astype(np.uint8)
@@ -66,8 +63,9 @@ def zed_depthfloat_to_abgr(f):
     h = hex(struct.unpack('<I', struct.pack('<f', f))[0])
     return [eval('0x'+a+b) for a, b in zip(h[::2], h[1::2]) if a+b != '0x']
 
+#######*************************************************
+#######*************************************************
 def perspective_ch(pts_src,pcd):
-  # pts_src = np.float32([[0, 0], [cols, 0], [0, 177], [379, 166]])
   pts_src[:,0]=pts_src[:,0]-min(pts_src[:,0])
   pts_src[:,1]=pts_src[:,1]-min(pts_src[:,1])
   pts_src_n=np.float32(np.array([pts_src[0],pts_src[3],pts_src[1],pts_src[2]]))
@@ -77,7 +75,7 @@ def perspective_ch(pts_src,pcd):
   M = cv2.getPerspectiveTransform(pts_src_n,pts_dst)
   # print(M)
   pcd_dst = cv2.warpPerspective(pcd, M, (cols, rows))
-  return pcd_dst
+  return pcd_dst,M
 def extract_in_4point_pcd(d):
   zed2pcd = np.load(f"{d}/pcd.npy")
   pt = json.load(open(f'{d}/frame.json'))['extract_frame_wh']
@@ -85,17 +83,18 @@ def extract_in_4point_pcd(d):
   sH,eH=min(pta[:,0]),max(pta[:,0])
   sR,eR=min(pta[:,1]),max(pta[:,1])
   pcd_frame=zed2pcd[sR:eR,sH:eH,:]
-  pcd_dst=perspective_ch(pta,pcd_frame)
+  pcd_dst,M=perspective_ch(pta,pcd_frame)
 
-  return pcd_dst
+  return pcd_dst,M
 
 base_dir = 'C:/00_work/05_src/data/frm_t'
 pcds=[]
 for p in os.listdir(base_dir):
   d = f'{base_dir}/{p}'
   if os.path.isdir(d):
-    pcd_dst=extract_in_4point_pcd(d)
+    pcd_dst,M=extract_in_4point_pcd(d)
     pcds.append([pcd_dst,p])
+
 pcda,pa=pcds[0]
 pcdb,pb=pcds[1]
 k=2
@@ -130,38 +129,3 @@ pcd_dst_b = cv2.warpPerspective(pcda, M, (cols, rows))
 pyln=convert_zed2pcd_to_ply(pcd_dst_b)
 filename = base_dir+'/'+pb+'_extracted_frame_perspective.ply'
 open3d.io.write_point_cloud(filename, pyln)
-
-#move pcd to the same position
-pcds=[pcd_dst_a,pcd_dst_b]
-wa,ha=pcd_dst_a.shape[:2]
-wb,hb=pcd_dst_b.shape[:2]
-k=10
-# train_x=pcd_dst_a[:,:,:3].reshape(-1,3)
-# y_pre=outlier_detection(train_x)
-# frames=[[k,k,wa-k,ha-k],[k,k,wb-k,hb-k]]
-# pcds_mv=move_pcds_by_frame(pcds, frames)
-# for pcd_mv,id in zip(pcds_mv,[pa,pb]):
-#   pyln=pcd_to_ply(pcd_mv)
-#   fn=base_dir+'/'+id+'add_frame_'+'_mv.ply'
-#   open3d.io.write_point_cloud(fn, pyln)
-
-def pcd_resize(pcds,flg=0):
-  pcd_size_lst=[]
-  xMean_base,yMean_base,zMean_base=1,1,1
-  for i,pcd in enumerate(pcds):
-      xMean,yMean,zMean=np.mean(pcd[:,:,0]),np.mean(pcd[:,:,1]),np.mean(pcd[:,:,2])
-      if i==0:
-        xMean_base, yMean_base, zMean_base=xMean,yMean,zMean
-        pcd_size_lst.append(pcd)
-        continue
-      rate = np.divide(np.array([xMean_base, yMean_base, zMean_base]),np.array([xMean,yMean,zMean]))
-      pcd[:,:,:3]=np.multiply(pcd[:,:,:3],rate)
-      pcd_size_lst.append(pcd)
-
-  return pcd_size_lst
-#resize pcd to the same size
-# pcd_size_lst=pcd_resize(pcds_mv)
-# for pcd_resize,id in zip(pcd_size_lst,[pa,pb]):
-#   pyln=pcd_to_ply(pcd_resize)
-#   fn=base_dir+'/'+id+'add_frame_'+'_resize.ply'
-#   open3d.io.write_point_cloud(fn, pyln)

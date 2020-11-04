@@ -2,8 +2,8 @@ import numpy as np
 import open3d
 
 
-p = 'C:/00_work/05_src/data/frm_t/20201015155835'
-# p = "data/toYOU_20201021_/20201015155835"
+p = 'C:/00_work/05_src/data/frm_t/20201015155844'
+# p = 'C:/00_work/05_src/data/frm_t/20201015155835'
 f = f"{p}/pcd_extracted.ply"
 pcd = open3d.io.read_point_cloud(f)
 def get_reg_linear(points,colors,X,Y,Z,pos_reg=2,color=[255,0,0]):
@@ -134,6 +134,7 @@ points_c=np.copy(points)
 pa=points_c[:, 0:2]
 pb=points_c[:, 2]
 param,x_fit=fit_pointcloud_plane(pa,pb)
+print(param)
 y_fit=param@x_fit.T
 points_c[:,2]=y_fit
 pcd_o=get_pcd_reg(points_c,colors,color=[255,0,0])
@@ -143,6 +144,7 @@ points_c=np.copy(points)
 pa=np.vstack([points_c[:, 0], points_c[:, 2]]).T
 pb=points_c[:, 1]
 param,x_fit=fit_pointcloud_plane(pa,pb)
+print(param)
 y_fit=param@x_fit.T
 points_c[:,1]=y_fit
 pcd_o=get_pcd_reg(points_c,colors,color=[0,255,0])
@@ -155,6 +157,7 @@ points_c=np.copy(points)
 pa=np.vstack([points_c[:, 1], points_c[:, 2]]).T
 pb=points_c[:, 0]
 param,x_fit=fit_pointcloud_plane(pa,pb)
+print(param)
 y_fit=param@x_fit.T
 points_c[:,0]=y_fit
 pcd_o=get_pcd_reg(points_c,colors,color=[0,0,255])

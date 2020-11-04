@@ -105,20 +105,6 @@ def get_rot_quaternion_from_vectors(source_vector, target_vector):
   q = get_rotation_quaternion(180., mean_vec)
   return q
 
-def apply_rotation_quaternion(q, positions):
-  assert isinstance(q, quaternion.quaternion)
-  assert isinstance(positions, np.ndarray)
-  """
-  https://kamino.hatenablog.com/entry/rotation_expressions#sec3_2
-  クォータニオンを使って点 p=(x,y,z) を回転させるときは、
-  点pを p_q = 0 + xi + yj + zk と読み替え、以下のように計算する。
-    p_q_rot = q * p_q * q.conj()
-  
-  * positionsはplyから読み込んだpcd.points。
-  * forループだと効率が悪いので、行列で一気に計算するのもあり。
-    mul_quaternion()がクォータニオンの乗算の原理。
-    right変数の列数を増やせば1回の行列積で演算可能。
-  """
 
 def verify_apply_rotation(p0):
   p = f'{p0}/pcd_extracted_plane_x.json'
@@ -134,12 +120,62 @@ def verify_apply_rotation(p0):
   #   if q is collectly defined, 
   #     q_tgt.vec - tgt_vec will be near zero.
   assert abs(q_tgt.vec - tgt_vec).max() < 1e-15
+def make_pcd(points, colors):
+  pcd = open3d.geometry.PointCloud()
+  pcd.points = open3d.utility.Vector3dVector(points)
+  pcd.colors = open3d.utility.Vector3dVector(colors)
+  return pcd
+
+
+def apply_rotation_quaternion(q, positions):
+  assert isinstance(q, quaternion.quaternion)
+  assert isinstance(positions, np.ndarray)
+  """
+  https://kamino.hatenablog.com/entry/rotation_expressions#sec3_2
+  クォータニオンを使って点 p=(x,y,z) を回転させるときは、
+  点pを p_q = 0 + xi + yj + zk と読み替え、以下のように計算する。
+    p_q_rot = q * p_q * q.conj()
+
+  * positionsはplyから読み込んだpcd.points。
+  * forループだと効率が悪いので、行列で一気に計算するのもあり。
+    mul_quaternion()がクォータニオンの乗算の原理。
+    right変数の列数を増やせば1回の行列積で演算可能。
+  """
+  p_q_lst = []
+  for p in list(positions):
+    p_q = np.quaternion(0., *p)
+    p_q_lst.append(p_q)
+  p_q_m = np.array(p_q_lst)
+  p_q_rot = q * p_q_m * q.conj()
+  points_n = []
+  for p in list(p_q_rot):
+    points_n.append([p.x, p.y, p.z])
+  return np.array(points_n)
+
 
 if __name__ == '__main__':
-  root_dir = 'C:/Users/003420/Desktop/Works/NICT/predevelopment/Zed2'
-  base = 'data/toYOU_20201021_'
-  os.chdir(root_dir)
+  # root_dir = 'C:/Users/003420/Desktop/Works/NICT/predevelopment/Zed2'
+  base ='C:/00_work/05_src/data/frm_t'
+  # os.chdir(root_dir)
+  src_vec_lst = EasyDict({})
+  dst_vec_lst = EasyDict({})
+  src_vec_lst['20201015155835']=[0.03323493,-1,0.00610331]
+  src_vec_lst['20201015155844']=[-0.0336802,-1,-0.3684832]
+  # dst_vec_lst['20201015155835']=[0.03323493,-1,0.00610331]
+  # dst_vec_lst['20201015155844']=[-0.0336802,-1,-0.3684832]
   for p in ["20201015155835", "20201015155844"]:
     p0 = f"{base}/{p}"
-    _ = get_plane_parameters(p0)
-  verify_apply_rotation(f"{base}/20201015155844")
+    # _ = get_plane_parameters(p0)
+    src_vec=np.array(src_vec_lst[p])
+    dst_vec=np.array([0,1,0])
+    q=get_rot_quaternion_from_vectors(src_vec,dst_vec)
+    f = f"{p0}/pcd_extracted.ply"
+    pcd = open3d.io.read_point_cloud(f)
+    points=np.array(pcd.points)
+    colors=np.array(pcd.colors)
+    points_r=apply_rotation_quaternion(q, points)
+    pcd_n=make_pcd(points_r,colors)
+    filename=f"{p0}/pcd_extracted_quaternion.ply"
+    open3d.io.write_point_cloud(filename, pcd_n)
+
+  # verify_apply_rotation(f"{base}/20201015155844")

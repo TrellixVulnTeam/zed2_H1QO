@@ -1,10 +1,8 @@
 import numpy as np
 import open3d
 
-
-p = 'C:/00_work/05_src/data/frm_t'
-# p = "data/toYOU_20201021_/20201015155835"
-f = f"{p}/20201015155835_extracted_frame.ply"
+p = 'C:/00_work/05_src/data/frm_t/20201015155835'
+f = f"{p}/pcd_extract_plane_rotation_m003.ply"
 pcd = open3d.io.read_point_cloud(f)
 def get_reg_linear(points,colors,X,Y,Z,pos_reg=2,color=[255,0,0]):
     # Zについて線形回帰実施(入力はXとY)。赤色で平面出力
@@ -15,7 +13,9 @@ def get_reg_linear(points,colors,X,Y,Z,pos_reg=2,color=[255,0,0]):
     # http://reliawiki.org/index.php/Multiple_Linear_Regression_Analysis
     # "Estimating Regression Models Using Least Squares"
     # （最小二乗法で一気にパラメータを計算する手法。）
-    bhat = np.linalg.inv(XY.T @ XY) @ XY.T@Z
+    XY1=XY.T @ XY
+    XY2=XY.T@Z
+    bhat = np.linalg.inv(XY1)@XY2
     print(bhat)
     Zhat = (XY @ bhat).reshape(-1,1)
     if pos_reg==0:

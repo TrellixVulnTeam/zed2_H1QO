@@ -1,6 +1,4 @@
 import open3d,math as mt,numpy as np
-def vector_compute(v0, v1, axis=0):
-    return np.cross(v0, v1, axis=axis)
 
 def vector_normalize(data):
     data = np.array(data, dtype=np.float64, copy=True)
@@ -12,7 +10,7 @@ def ang_two_vectors(v0, v1, directed=True, axis=0):
     dot /= vector_normalize(v0) * vector_normalize(v1)
     return np.arccos(dot if directed else np.fabs(dot))
 
-def unit_ch_vector(data, axis=None, out=None):
+def unit_ch_vector(data):
     data = np.array(data, dtype=np.float64, copy=True)
     data /= mt.sqrt(np.dot(data, data))
     return data
@@ -21,7 +19,6 @@ def get_rotation_matrix(ang, direct, point=None):
     sina = mt.sin(ang)
     cosa = mt.cos(ang)
     direct = unit_ch_vector(direct[:3])
-    # rotation matrix around unit vector
     R = np.diag([cosa, cosa, cosa])
     R += np.outer(direct, direct) * (1.0 - cosa)
     direct *= sina
@@ -31,7 +28,6 @@ def get_rotation_matrix(ang, direct, point=None):
     M = np.identity(4)
     M[:3, :3] = R
     if point is not None:
-        # rotation not around origin
         point = np.array(point[:3], dtype=np.float64, copy=False)
         M[:3, 3] = point - np.dot(R, point)
     return M
@@ -43,10 +39,16 @@ vec20201015155844_x=[-1,-18.56481766,-6.71416052]
 vec20201015155835_z=[-0.06199354,4.22205205,-1]
 vec20201015155835_y=[0.03323493,-1,0.00610331]
 vec20201015155835_x=[-1,19.77586931,-0.05332476]
+
 def rotaton_ply(p,v0,v1):
-    rotation_m = get_rotation_matrix(ang_two_vectors(v0, v1), vector_compute(v0, v1))
+    vec_cross=np.cross(v0, v1, axis=0)
+    position = 0
     f = f"{p}/pcd_extracted.ply"
     pcd = open3d.io.read_point_cloud(f)
+    points=np.array(pcd.points)
+    if position==0:
+        position=[np.mean(points[:,0]),np.mean(points[:,1]),np.mean(points[:,2])]
+    rotation_m = get_rotation_matrix(ang_two_vectors(v0, v1), vec_cross,position)
     print(rotation_m)
     pcd_r=pcd.transform(rotation_m)
     open3d.io.write_point_cloud(f'{p}/pcd_extract_plane_rotation.ply', pcd_r)
