@@ -265,6 +265,7 @@ def __take_cbk(arg):
     print(arg)
 def __looptake(i,menu):
     j = 0
+    print("__looptake",i)
     take(menu)
     # while True:
     #     take(menu)
