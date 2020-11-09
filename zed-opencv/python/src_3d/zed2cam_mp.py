@@ -263,15 +263,24 @@ def save(menu):
 from  multiprocessing import Pool
 def __take_cbk(arg):
     print(arg)
+
+
+def Foo(i, j):
+  t = np.random.random_integers(0, 10, 1)
+  time.sleep(t)
+  # print(i + 100)
+  print('process :%d, loop:%d is called' % (i + 100, j))
+  return i + 100
 def __looptake(i,menu):
     j = 0
     print("__looptake",i)
-    take(menu)
-    # while True:
-    #     take(menu)
-    #     print('process :%d, loop:%d is started' % (i, j))
-    #     time.sleep(0.2)
-    #     j = j + 1
+    # take(menu)
+    while True:
+        # take(menu)
+        Foo(i, j)
+        print('process :%d, loop:%d is started' % (i, j))
+        time.sleep(0.2)
+        j = j + 1
 def take_data(root_dir):
     class multi_take:
       def __init__(self, interval, pron):
