@@ -6,7 +6,7 @@ import numpy as np
 
 
 def Foo(i, j):
-    t = np.random.random_integers(0, 10, 1)
+    t = np.random.randint(0, 10)
     time.sleep(t)
     # print(i + 100)
     print('process :%d, loop:%d is called' % (i + 100, j))
@@ -30,12 +30,6 @@ def take_data():
       def __init__(self, interval, pron):
         self.pool = Pool(processes=pron)
         self.interval=interval
-      def looptake(self,work,i):
-        while True:
-            work(i)
-            time.sleep(0.2)
-            print(i)
-        pass
       def start(self,work,n,cbk):
         for i in range(n):
             kk="cam:%d"%(i)
