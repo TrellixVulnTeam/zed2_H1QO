@@ -265,14 +265,13 @@ def __take_cbk(arg):
     print(arg)
 def __looptake(i,menu_cam):
     j = 0
-
     menu, cam_serid = menu_cam
-    take(menu)
-    # while True:
-    #     take(menu)
-    #     print('process :%d, loop:%d is started' % (i, j))
-    #     time.sleep(0.2)
-    #     j = j + 1
+    # take(menu)
+    while True:
+        take(menu)
+        print('process :%d, loop:%d is started' % (i, j))
+        time.sleep(0.2)
+        j = j + 1
 def take_data(root_dir):
     class multi_take:
       def __init__(self, interval, pron):
@@ -318,10 +317,10 @@ def take_data(root_dir):
       if comm == 't':
         # menu = take(menu)
         print("take start")
-        for i,menu_cam in enumerate(menus):
+        # for i,menu_cam in enumerate(menus):
           # menu,cam_ser=menu_cam
-          __looptake(i,menu_cam)
-        # mp.start(__looptake, menus, __take_cbk)
+          # __looptake(i,menu_cam)
+        mp.start(__looptake, menus, __take_cbk)
       elif comm == 'q':
         # print(f'available devices:{menu.zed.cam.get_device_list()}')
         print('finish script...')
