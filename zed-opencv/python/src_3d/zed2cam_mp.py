@@ -271,10 +271,10 @@ def Foo(i, j):
   # print(i + 100)
   print('process :%d, loop:%d is called' % (i + 100, j))
   return i + 100
-def __looptake(*args):
+def __looptake(*args,**kwargs):
     j = 0
     i=args[0]
-    menu=args[1]
+    menu=kwargs
     print("__looptake",i)
     print("__looptake",menu)
     while True:
@@ -292,7 +292,8 @@ def take_data(root_dir):
         for i,menu_cam in enumerate(menus):
             menu, cam_serid = menu_cam
             self.pool.apply_async(func=work,
-                                  args=(i,menu,),
+                                  args=(i,),
+                                  kwds=menu,
                                   # args=(i,i,),
                                   callback=cbk)
             time.sleep(0.1)

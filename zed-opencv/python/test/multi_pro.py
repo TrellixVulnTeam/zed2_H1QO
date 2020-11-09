@@ -18,11 +18,12 @@ def __Bar(arg):
     print(arg)
 
 
-def __looptake(*args):
-    j = 0
-
+def __looptake(*args,**kwargs):
     i=args[0]
-    menu=args[1]
+    menu=kwargs
+    print("__looptake",i)
+    print("__looptake",menu)
+
     while True:
         Foo(i, j)
         print('process :%d, loop:%d is started' % (i + 100, j))
@@ -37,7 +38,8 @@ def take_data():
         for i ,menu in enumerate(menus):
             kk=["cam:%d"%(i),"cam:%d"%(i)]
             self.pool.apply_async(func=work,
-                                  args=(i,menu,),
+                                  args=(i,),
+                                  kwds=menu,
                                   callback=cbk)
             print("process: %d is started!"%(i))
       def terminate(self):
