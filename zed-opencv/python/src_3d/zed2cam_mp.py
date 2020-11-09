@@ -274,7 +274,7 @@ def Foo(i, j):
 def __looptake(*args,**kwargs):
     j = 0
     i=args[0]
-    menu=kwargs
+    menu=args[1]
     print("__looptake",i)
     print("__looptake",menu)
     while True:
@@ -302,7 +302,9 @@ def take_data(root_dir):
         self.pool.close()
         self.pool.terminate()
 
-    mp = multi_take(0.2, 5)
+    # mp = multi_take(0.2, 5)
+
+    pool = Pool(processes=5)
     root_dir_tmp = input(f'Please set data save directory. default[{root_dir}] :')
     if root_dir_tmp != '':
       root_dir = root_dir_tmp
@@ -328,7 +330,12 @@ def take_data(root_dir):
         # for i,menu_cam in enumerate(menus):
         #   menu,cam_ser=menu_cam
         #   __looptake(i,menu)
-        mp.start(__looptake, menus, __take_cbk)
+        # mp.start(__looptake, menus, __take_cbk)
+        for i,menu_cam in enumerate(menus):
+          menu,cam_ser=menu_cam
+          pool.apply_async(func=__looptake,
+                           args=(i,menu,),
+                           callback=__take_cbk)
       elif comm == 'q':
         # print(f'available devices:{menu.zed.cam.get_device_list()}')
         print('finish script...')
@@ -340,8 +347,8 @@ def take_data(root_dir):
     for i,menu_cam in enumerate(menus):
         menu,cam_ser=menu_cam
         menu.zed.cam.close()
-    mp.pool.close()
-    mp.terminate()
+    pool.close()
+    pool.terminate()
     sys.exit(1)
 
 if __name__ == "__main__":
