@@ -284,7 +284,7 @@ def take_data(root_dir):
                                   args=(i,menu_cam,),
                                   callback=cbk)
             time.sleep(0.1)
-            print("process: %d is started!"%(i))
+            print("process: %d is started!"%(i),menu_cam)
       def terminate(self):
         self.pool.close()
         self.pool.terminate()
