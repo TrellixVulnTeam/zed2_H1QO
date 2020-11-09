@@ -263,10 +263,8 @@ def save(menu):
 from  multiprocessing import Pool
 def __take_cbk(arg):
     print(arg)
-def __looptake(i,menu_cam):
+def __looptake(i,menu):
     j = 0
-    menu, cam_serid = menu_cam
-    print(cam_serid)
     take(menu)
     # while True:
     #     take(menu)
@@ -280,11 +278,12 @@ def take_data(root_dir):
         self.interval=interval
       def start(self,work,menus,cbk):
         for i,menu_cam in enumerate(menus):
+            menu, cam_serid = menu_cam
             self.pool.apply_async(func=work,
-                                  args=(i,menu_cam,),
+                                  args=(i,menu,),
                                   callback=cbk)
             time.sleep(0.1)
-            print("process: %d is started!"%(i),menu_cam)
+            print("process: %d is started!"%(i),cam_serid)
       def terminate(self):
         self.pool.close()
         self.pool.terminate()
