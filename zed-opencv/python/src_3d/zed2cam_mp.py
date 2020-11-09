@@ -100,7 +100,7 @@ def switch_take_mode(menu, mode):
   m.point_cloud = True if mode in [TakeMode.ALL, TakeMode.PCD] else False
   return menu
 
-def init_params(cam_id=0):
+def init_params(menu,cam_id=0):
   global save_dir
   zed = EasyDict({})
   zed.cam = sl.Camera()
@@ -153,7 +153,7 @@ def reset_cam(menu, cam_id):
       menu.zed.cam.close()
   menu = init_menu()
   menu.save_dir = save_dir_fmt.format(cam_id).replace('//','/')
-  menu.zed = init_params(cam_id)
+  menu.zed = init_params(menu,cam_id)
   menu = open_cam(menu)
   return menu
 
@@ -161,7 +161,7 @@ def reset_cam(menu, cam_id):
 def init(menu, cam_id=0):
   menu = init_menu()
   menu.save_dir = save_dir_fmt.format(cam_id).replace('//','/')
-  menu.zed = init_params(cam_id)
+  menu.zed = init_params(menu,cam_id)
   menu = open_cam(menu)
   return menu
 
