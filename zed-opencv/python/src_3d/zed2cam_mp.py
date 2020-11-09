@@ -57,7 +57,7 @@ def all_done():
        menu.zed.cam.close()
   del menu
   print('proc done.')
-atexit.register(all_done)
+# atexit.register(all_done)
 
 def stop_watch(func) :
   @functools.wraps(func)
@@ -133,7 +133,7 @@ def init_params(cam_id=0):
   save_dir = save_dir_fmt.format(cam_id)
   return zed
 
-menu = init_menu()
+# menu = init_menu()
 
 def open_cam(menu):
   zed = menu.zed
