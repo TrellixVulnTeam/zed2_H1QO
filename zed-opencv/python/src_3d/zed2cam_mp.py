@@ -290,8 +290,8 @@ def take_data(root_dir):
         for i,menu_cam in enumerate(menus):
             menu, cam_serid = menu_cam
             self.pool.apply_async(func=work,
-                                  # args=(i,menu,),
-                                  args=(i,i,),
+                                  args=(i,menu,),
+                                  # args=(i,i,),
                                   callback=cbk)
             time.sleep(0.1)
             print("process: %d is started!"%(i),cam_serid)
