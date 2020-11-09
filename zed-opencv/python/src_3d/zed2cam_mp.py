@@ -271,10 +271,12 @@ def Foo(i, j):
   # print(i + 100)
   print('process :%d, loop:%d is called' % (i + 100, j))
   return i + 100
-def __looptake(i,menu):
+def __looptake(*args):
     j = 0
+    i=args[0]
+    menu=args[1]
     print("__looptake",i)
-    # take(menu)
+    print("__looptake",menu)
     while True:
         # take(menu)
         Foo(i, j)
@@ -323,8 +325,8 @@ def take_data(root_dir):
         # menu = take(menu)
         print("take start")
         # for i,menu_cam in enumerate(menus):
-          # menu,cam_ser=menu_cam
-          # __looptake(i,menu_cam)
+        #   menu,cam_ser=menu_cam
+        #   __looptake(i,menu)
         mp.start(__looptake, menus, __take_cbk)
       elif comm == 'q':
         # print(f'available devices:{menu.zed.cam.get_device_list()}')

@@ -3,6 +3,7 @@ import multiprocessing
 from  multiprocessing import Pool
 import time
 import numpy as np
+from easydict import EasyDict
 
 
 def Foo(i, j):
@@ -17,9 +18,11 @@ def __Bar(arg):
     print(arg)
 
 
-def __looptake(i,kk):
+def __looptake(*args):
     j = 0
-    print(kk)
+
+    i=args[0]
+    menu=args[1]
     while True:
         Foo(i, j)
         print('process :%d, loop:%d is started' % (i + 100, j))
@@ -30,11 +33,11 @@ def take_data():
       def __init__(self, interval, pron):
         self.pool = Pool(processes=pron)
         self.interval=interval
-      def start(self,work,n,cbk):
-        for i in range(n):
-            kk="cam:%d"%(i)
+      def start(self,work,menus,cbk):
+        for i ,menu in enumerate(menus):
+            kk=["cam:%d"%(i),"cam:%d"%(i)]
             self.pool.apply_async(func=work,
-                                  args=(i,kk,),
+                                  args=(i,menu,),
                                   callback=cbk)
             print("process: %d is started!"%(i))
       def terminate(self):
@@ -42,13 +45,24 @@ def take_data():
         self.pool.terminate()
 
     mp = multi_take(0.2, 5)
+
+
     while True:
         comm = input('Please enter command(t: take data, q:quit, [0-2]: reinit camera): ')
         if not comm in ['t', 'q', '0', '1', '2']:
             continue
         if comm == 't':
             print("take start")
-            mp.start(__looptake, 10, __Bar)
+            menus=[]
+            def get_menu():
+                menu = EasyDict({})
+                menu.init = False
+                return menu
+
+            menus.append(get_menu())
+            menus.append(get_menu())
+            menus.append(get_menu())
+            mp.start(__looptake, menus, __Bar)
         elif comm == 'q':
             if mp is not None:
                 print("end multi take")
