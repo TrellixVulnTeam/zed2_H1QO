@@ -273,7 +273,7 @@ def __looptake(i,menu_cam):
     #     print('process :%d, loop:%d is started' % (i, j))
     #     time.sleep(0.2)
     #     j = j + 1
-def take_data(menu,root_dir):
+def take_data(root_dir):
     class multi_take:
       def __init__(self, interval, pron):
         self.pool = Pool(processes=pron)
@@ -338,4 +338,4 @@ def take_data(menu,root_dir):
     sys.exit(1)
 
 if __name__ == "__main__":
-  take_data(menu,root_dir)
+  take_data(root_dir)
