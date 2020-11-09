@@ -333,7 +333,7 @@ def take_data(root_dir):
         # mp.start(__looptake, menus, __take_cbk)
         for i,menu_cam in enumerate(menus):
           menu,cam_ser=menu_cam
-          pool.apply_async(func=__looptake,
+          pool.apply(func=__looptake,
                            args=(i,menu,),
                            callback=__take_cbk)
       elif comm == 'q':
