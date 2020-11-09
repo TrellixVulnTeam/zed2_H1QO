@@ -334,7 +334,7 @@ def take_data(root_dir):
         for i,menu_cam in enumerate(menus):
           menu,cam_ser=menu_cam
           pool.apply_async(func=__looptake,
-                           args=(i,cam_ser,),
+                           args=(i,sl,),
                            callback=__take_cbk)
       elif comm == 'q':
         # print(f'available devices:{menu.zed.cam.get_device_list()}')
