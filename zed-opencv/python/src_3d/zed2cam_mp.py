@@ -265,16 +265,18 @@ def __take_cbk(arg):
     print(arg)
 
 
+menus=[]
 def Foo(i, j):
   t = np.random.randint(0, 10)
   time.sleep(t)
   # print(i + 100)
   print('process :%d, loop:%d is called' % (i + 100, j))
   return i + 100
-def __looptake(*args,**kwargs):
-    j = 0
-    i=args[0]
-    menu=args[1]
+def __looptake(i):
+    global menus
+    # j = 0
+    # i=args[0]
+    menu=menus[i]
     print("__looptake",i)
     print("__looptake",menu)
     while True:
@@ -284,6 +286,7 @@ def __looptake(*args,**kwargs):
         time.sleep(0.2)
         j = j + 1
 def take_data(root_dir):
+    global menus
     class multi_take:
       def __init__(self, interval, pron):
         self.pool = Pool(processes=pron)
@@ -314,7 +317,6 @@ def take_data(root_dir):
         print(f"{root_dir} is created.")
 
     cameras = sl.Camera.get_device_list()
-    menus=[]
     for cam_id, cam in enumerate(cameras):
       menu=init(None, cam_id)
       menus.append([menu,cam.serial_number])
@@ -334,7 +336,7 @@ def take_data(root_dir):
         for i,menu_cam in enumerate(menus):
           menu,cam_ser=menu_cam
           pool.apply_async(func=__looptake,
-                           args=(i,sl,),
+                           args=(i,),
                            callback=__take_cbk)
       elif comm == 'q':
         # print(f'available devices:{menu.zed.cam.get_device_list()}')
