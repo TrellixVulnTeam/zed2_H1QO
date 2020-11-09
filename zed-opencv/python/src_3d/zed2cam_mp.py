@@ -267,12 +267,12 @@ def __looptake(i,menu_cam):
     j = 0
 
     menu, cam_serid = menu_cam
-    # menu.save_dir
-    while True:
-        take(menu)
-        print('process :%d, loop:%d is started' % (i, j))
-        time.sleep(0.2)
-        j = j + 1
+    take(menu)
+    # while True:
+    #     take(menu)
+    #     print('process :%d, loop:%d is started' % (i, j))
+    #     time.sleep(0.2)
+    #     j = j + 1
 def take_data(menu,root_dir):
     class multi_take:
       def __init__(self, interval, pron):
@@ -281,7 +281,7 @@ def take_data(menu,root_dir):
       def looptake(self,work,i):
         while True:
             work(i)
-            time.sleep(0.2)
+            time.sleep(self.interval)
             print(i)
         pass
       def start(self,work,menus,cbk):
@@ -307,27 +307,32 @@ def take_data(menu,root_dir):
     cameras = sl.Camera.get_device_list()
     menus=[]
     for cam_id, cam in enumerate(cameras):
-      menus.append([init(menu, cam_id),cam.serial_number])
-    print(f'menu.save_dir: {menu.save_dir}')
-    print(f'available devices:{menu.zed.cam.get_device_list()}')
+      menu=init(None, cam_id)
+      menus.append([menu,cam.serial_number])
+      print(f'menu.save_dir: {menu.save_dir}')
+      print(f'available devices:{cameras}')
     while True:
-      comm = input('Please enter command(t: take data, q:quit, [0-2]: reinit camera): ')
+      comm = input('Please enter command(t: take data, q:quit: ')
       if not comm in ['t', 'q']:
         continue
       if comm == 't':
         # menu = take(menu)
         print("take start")
-        mp.start(__looptake, menus, __take_cbk)
+        for i,menu_cam in enumerate(menus):
+          # menu,cam_ser=menu_cam
+          __looptake(i,menu_cam)
+        # mp.start(__looptake, menus, __take_cbk)
       elif comm == 'q':
-        print(f'available devices:{menu.zed.cam.get_device_list()}')
+        # print(f'available devices:{menu.zed.cam.get_device_list()}')
         print('finish script...')
         break
-      else:
-        menu = reset_cam(menu, int(comm))
-        print(f'menu.save_dir: {menu.save_dir}')
-        print(f'available devices:{menu.zed.cam.get_device_list()}')
-
-    menu.zed.cam.close()
+      # else:
+      #   menu = reset_cam(menu, int(comm))
+      #   print(f'menu.save_dir: {menu.save_dir}')
+        # print(f'available devices:{menu.zed.cam.get_device_list()}')
+    for i,menu_cam in enumerate(menus):
+        menu,cam_ser=menu_cam
+        menu.zed.cam.close()
     mp.pool.close()
     mp.terminate()
     sys.exit(1)
