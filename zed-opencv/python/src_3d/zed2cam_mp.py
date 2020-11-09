@@ -266,23 +266,18 @@ def __take_cbk(arg):
 def __looptake(i,menu_cam):
     j = 0
     menu, cam_serid = menu_cam
-    # take(menu)
-    while True:
-        take(menu)
-        print('process :%d, loop:%d is started' % (i, j))
-        time.sleep(0.2)
-        j = j + 1
+    print(cam_serid)
+    take(menu)
+    # while True:
+    #     take(menu)
+    #     print('process :%d, loop:%d is started' % (i, j))
+    #     time.sleep(0.2)
+    #     j = j + 1
 def take_data(root_dir):
     class multi_take:
       def __init__(self, interval, pron):
         self.pool = Pool(processes=pron)
         self.interval=interval
-      def looptake(self,work,i):
-        while True:
-            work(i)
-            time.sleep(self.interval)
-            print(i)
-        pass
       def start(self,work,menus,cbk):
         for i,menu_cam in enumerate(menus):
             self.pool.apply_async(func=work,
