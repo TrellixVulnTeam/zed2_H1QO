@@ -266,7 +266,7 @@ def __take_cbk(arg):
 
 
 def Foo(i, j):
-  t = np.random.random_integers(0, 10, 1)
+  t = np.random.randint(0, 10)
   time.sleep(t)
   # print(i + 100)
   print('process :%d, loop:%d is called' % (i + 100, j))
