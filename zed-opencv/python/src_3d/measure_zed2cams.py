@@ -30,7 +30,7 @@ class multi_take:
     self.interval=interval
     self.menus=[]
     self.info="take started"
-    self.run=True
+    self.run=False
   def start(self,work,cam_ids,cbk):
     for i in cam_ids:
         self.pool.apply_async(func=work,
@@ -62,7 +62,6 @@ def take_data(root_dir):
       root_dir = root_dir_tmp
       if not os.path.exists(root_dir):
         os.makedirs(root_dir, exist_ok=True)
-        # save_dir_fmt = root_dir + "/cam{}/"
         print(f"{root_dir} is created.")
 
     cameras = sl.Camera.get_device_list()
@@ -83,6 +82,7 @@ def take_data(root_dir):
     print('Please enter command(t: take data, q:quit: ')
     im = np.zeros((300, 800), np.uint8)
     cv2.imshow('Keypressed', im)
+
     while(1):
         k = cv2.waitKey(0)
         im_c = im.copy()
@@ -99,7 +99,8 @@ def take_data(root_dir):
             mp.run=False
             print('finish script...')
             break
-        elif k == 116 or  k == 84:#t
+        elif (k == 116 or  k == 84) and mp.run==False:#t
+            mp.run=True
             mp.start(mp_f, cam_ids, mp.looptake_cbd)
         else:
             continue
