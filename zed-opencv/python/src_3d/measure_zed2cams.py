@@ -7,8 +7,10 @@ root_dir =  "dt/output/"
 save_dir_fmt = root_dir + "/cam{}/"
 def __looptake_cbd(arg):
     pass
-def __looptake(cam_id):
+def __looptake(cam_id,r_dir):
     menu=init(None, cam_id)
+    save_dir_fmt_t = r_dir + "/cam{cam_id}/"
+    menu.save_dir=save_dir_fmt_t
     print(f'menu.save_dir: {menu.save_dir}')
     j=0
     while True:
@@ -23,10 +25,10 @@ class multi_take:
   def __init__(self, interval, pron):
     self.pool = Pool(processes=pron)
     self.interval=interval
-  def start(self,work,cam_ids,cbk):
+  def start(self,work,cam_ids,r_dir,cbk):
     for i in cam_ids:
         self.pool.apply_async(func=work,
-                              args=(i,),
+                              args=(i,r_dir,),
                               callback=cbk)
         time.sleep(0.1)
         print("process: camera-%d is started!"%(i))
@@ -34,7 +36,8 @@ class multi_take:
   def terminate(self):
     self.pool.close()
     self.pool.terminate()
-def take_data(root_dir):
+def take_data():
+    global root_dir
     mp = multi_take(0.2, 5)
     root_dir_tmp = input(f'Please set data save directory. default[{root_dir}] :')
     if root_dir_tmp != '':
@@ -52,7 +55,7 @@ def take_data(root_dir):
       if not comm in ['t', 'q']:
         continue
       if comm == 't':
-        mp.start(__looptake, cam_ids, __looptake_cbd)
+        mp.start(__looptake, cam_ids,root_dir, __looptake_cbd)
       elif comm == 'q':
         print('finish script...')
         break
@@ -61,4 +64,4 @@ def take_data(root_dir):
     sys.exit(1)
 
 if __name__ == "__main__":
-  take_data(root_dir)
+  take_data()
