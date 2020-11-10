@@ -44,7 +44,7 @@ class multi_take:
     self.menus.append(menu)
     print(f'camera:{cam_id}, menu.save_dir: {menu.save_dir}')
     j=0
-    while (self.run):
+    while (1):
         take(menu)
         print('***************process :%d, loop:%d is started' % (cam_id, j))
         # self.info = 'process :%d, loop:%d is started' % (cam_id, j)
