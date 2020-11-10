@@ -26,8 +26,8 @@ class multi_take:
     self.interval=interval
   def start(self,work,cam_ids,cbk):
     for i in cam_ids:
-        # self.pool.apply_async(func=work,
-        self.pool.apply_async(func=self.looptake,
+        self.pool.apply_async(func=work,
+        # self.pool.apply_async(func=self.looptake,
                               args=(i,),
                               callback=cbk)
         time.sleep(0.1)
