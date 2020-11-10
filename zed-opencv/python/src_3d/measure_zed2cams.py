@@ -1,6 +1,6 @@
 import os, sys, time
 import pyzed.sl as sl
-# import numpy as np
+import numpy as np
 # from easydict import EasyDict
 # from enum import IntEnum
 from zed2cams import init,take
@@ -44,7 +44,8 @@ class multi_take:
     j=0
     while True:
         take(menu)
-        print('process :%d, loop:%d is started' % (cam_id, j))
+        # print('process :%d, loop:%d is started' % (cam_id, j))
+        self.info = 'process :%d, loop:%d is started' % (cam_id, j)
         time.sleep(self.interval)
         j = j + 1
   def terminate(self):
@@ -78,15 +79,27 @@ def take_data(root_dir):
     #     break
 
     print('Please enter command(t: take data, q:quit: ')
+    im = np.zeros((100, 300), np.uint8)
+    cv2.imshow('Keypressed', im)
     while(1):
         k = cv2.waitKey(10)
+        im_c = im.copy()
+        cv2.putText(
+            im_c,
+            f'{chr(k)} -> {k}\n%s'%(mp.info),
+            (10, 60),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            1,
+            (255, 255, 255),
+            2)
+        cv2.imshow('Keypressed', im_c)
         if k == 27:  # Esc key to stop
             print('finish script...')
             break
         elif k == 116 or  k == 84:#t
             mp.start(mp_f, cam_ids, mp.looptake_cbd)
         else:
-            print('Please enter command(t: take data, q:quit: ')
+            continue
     mp.terminate()
     sys.exit(1)
 
