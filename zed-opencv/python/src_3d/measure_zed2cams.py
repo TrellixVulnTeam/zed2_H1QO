@@ -8,10 +8,10 @@ from  multiprocessing import Pool
 
 root_dir =  "dt/output/"
 save_dir_fmt = root_dir + "/cam{}/"
-def __take_cbk(arg):
+def __looptake_cbd(arg):
     pass
 
-def __looptake(cam_id):
+def __looptake2(cam_id):
     menu=init(None, cam_id)
     print(f'menu.save_dir: {menu.save_dir}')
     j=0
@@ -20,28 +20,32 @@ def __looptake(cam_id):
         print('process :%d, loop:%d is started' % (cam_id, j))
         time.sleep(0.2)
         j = j + 1
+
+def mp_f(cam_id):
+  return cam_id
 class multi_take:
   def __init__(self, interval, pron):
     self.pool = Pool(processes=pron)
     self.interval=interval
+    self.menus=[]
   def start(self,work,cam_ids,cbk):
     for i in cam_ids:
         self.pool.apply_async(func=work,
-        # self.pool.apply_async(func=self.looptake,
                               args=(i,),
                               callback=cbk)
         time.sleep(0.1)
         print("process: camera-%d is started!"%(i))
 
-  def looptake(self,cam_id):
-    self.menu = init(None, cam_id)
-    print(f'menu.save_dir: {self.menu.save_dir}')
-    j = 0
+  def looptake_cbd(self,cam_id):
+    menu=init(None, cam_id)
+    self.menus.append(menu)
+    print(f'menu.save_dir: {menu.save_dir}')
+    j=0
     while True:
-      take(self.menu)
-      print('process :%d, loop:%d is started' % (cam_id, j))
-      time.sleep(0.2)
-      j = j + 1
+        take(menu)
+        print('process :%d, loop:%d is started' % (cam_id, j))
+        time.sleep(self.interval)
+        j = j + 1
   def terminate(self):
     self.pool.close()
     self.pool.terminate()
@@ -68,8 +72,7 @@ def take_data(root_dir):
       if not comm in ['t', 'q']:
         continue
       if comm == 't':
-        mp.start(__looptake, cam_ids, __take_cbk)
-        # mp.start(mp.looptake, cam_ids, __take_cbk)
+        mp.start(mp_f, cam_ids, mp.looptake_cbd)
       elif comm == 'q':
         print('finish script...')
         break

@@ -20,7 +20,8 @@ def __Bar(arg):
     print(arg)
 
 def Bar2(arg):
-    print("I am __Bar2: %s"%arg)
+    print("I am __Bar2: %d"%arg)
+    return 1
 
 def __looptake(*args,**kwargs):
     i=args[0]
@@ -34,19 +35,29 @@ def __looptake(*args,**kwargs):
         print('process :%d, loop:%d is started' % (i + 100, j))
         time.sleep(0.2)
         j = j + 1
+def f(i):
+    return i
 def take_data():
+
     class multi_take:
       def __init__(self, interval, pron):
         self.pool = Pool(processes=pron)
         self.interval=interval
       def start(self,work,menus,cbk):
+
         for i ,menu in enumerate(menus):
             kk=["cam:%d"%(i),"cam:%d"%(i)]
-            self.pool.apply_async(func=work,
+            self.pool.apply_async(func=f,
                                   args=(i,),
-                                  kwds=menu,
                                   callback=cbk)
             print("process: %d is started!"%(i))
+
+      def looptake(self, cam_id):
+          j = 0
+          while True:
+              print('process :%d, loop:%d is started' % (cam_id, j))
+              time.sleep(0.2)
+              j = j + 1
       def terminate(self):
         self.pool.close()
         self.pool.terminate()
@@ -69,7 +80,7 @@ def take_data():
             menus.append(get_menu())
             menus.append(get_menu())
             menus.append(get_menu())
-            mp.start(__looptake, menus, __Bar)
+            mp.start(__looptake, menus, mp.looptake)
         elif comm == 'q':
             if mp is not None:
                 print("end multi take")
