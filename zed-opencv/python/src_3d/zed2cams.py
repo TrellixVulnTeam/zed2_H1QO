@@ -172,8 +172,8 @@ def get_pose_transform_matrix(menu):
       stat = menu.zed.cam.grab(menu.zed.param.runtime)
       if menu.zed.cam.get_position(menu.zed.mat.pose) == sl.POSITIONAL_TRACKING_STATE.OK:
         break
-      if time.time()-st > 1.:
-        break
+      # if time.time()-st > 1.:
+      #   break
   if menu.zed.cam.get_position(menu.zed.mat.pose) == \
       sl.POSITIONAL_TRACKING_STATE.OK:
     transform = menu.zed.mat.pose.pose_data(menu.zed.mat.transform)
