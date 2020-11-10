@@ -29,6 +29,7 @@ class multi_take:
     self.pool = Pool(processes=pron)
     self.interval=interval
     self.menus=[]
+    self.info="take started"
   def start(self,work,cam_ids,cbk):
     for i in cam_ids:
         self.pool.apply_async(func=work,
@@ -82,7 +83,7 @@ def take_data(root_dir):
     im = np.zeros((100, 300), np.uint8)
     cv2.imshow('Keypressed', im)
     while(1):
-        k = cv2.waitKey(10)
+        k = cv2.waitKey(0)
         im_c = im.copy()
         cv2.putText(
             im_c,
