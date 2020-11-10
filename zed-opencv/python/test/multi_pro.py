@@ -15,17 +15,22 @@ def Foo(i, j):
 
 
 def __Bar(arg):
+    t = np.random.randint(0, 10)
+    time.sleep(t)
     print(arg)
 
+def Bar2(arg):
+    print("I am __Bar2: %s"%arg)
 
 def __looptake(*args,**kwargs):
     i=args[0]
     menu=kwargs
-    print("__looptake",i)
-    print("__looptake",menu)
-
+    # print("__looptake",i)
+    # print("__looptake",menu)
+    j=0
     while True:
-        Foo(i, j)
+        # Foo(i, j)
+        Bar2("__looptake")
         print('process :%d, loop:%d is started' % (i + 100, j))
         time.sleep(0.2)
         j = j + 1
