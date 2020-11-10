@@ -42,12 +42,12 @@ class multi_take:
   def looptake_cbd(self,cam_id):
     menu=init(None, cam_id)
     self.menus.append(menu)
-    print(f'menu.save_dir: {menu.save_dir}')
+    print(f'camera:{cam_id}, menu.save_dir: {menu.save_dir}')
     j=0
     while (self.run):
         take(menu)
-        # print('process :%d, loop:%d is started' % (cam_id, j))
-        self.info = 'process :%d, loop:%d is started' % (cam_id, j)
+        print('***************process :%d, loop:%d is started' % (cam_id, j))
+        # self.info = 'process :%d, loop:%d is started' % (cam_id, j)
         time.sleep(self.interval)
         j = j + 1
   def terminate(self):
@@ -69,41 +69,38 @@ def take_data(root_dir):
     for cam_id, cam in enumerate(cameras):
       cam_ids.append(cam_id)
     print(f'available devices:{cameras}')
-    # while True:
-    #   comm = input('Please enter command(t: take data, q:quit: ')
-    #   if not comm in ['t', 'q']:
-    #     continue
-    #   if comm == 't':
-    #     mp.start(mp_f, cam_ids, mp.looptake_cbd)
-    #   elif comm == 'q':
-    #     print('finish script...')
-    #     break
+    while True:
+      comm = input('Please enter command(t: take data, q:quit: ')
+      if not comm in ['t', 'q']:
+        continue
+      if comm == 't':
+        mp.run = True
+        mp.start(mp_f, cam_ids, mp.looptake_cbd)
+      elif comm == 'q':
+        mp.run = False
+        print('finish script...')
+        break
 
-    print('Please enter command(t: take data, q:quit: ')
-    im = np.zeros((300, 800), np.uint8)
-    cv2.imshow('Keypressed', im)
-
-    while(1):
-        k = cv2.waitKey(0)
-        im_c = im.copy()
-        cv2.putText(
-            im_c,
-            f'{chr(k)} -> {k}\n%s'%(mp.info),
-            (10, 40),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            1,
-            (255, 255, 255),
-            2)
-        cv2.imshow('Keypressed', im_c)
-        if k == 27:  # Esc key to stop
-            mp.run=False
-            print('finish script...')
-            break
-        elif (k == 116 or  k == 84) and mp.run==False:#t
-            mp.run=True
-            mp.start(mp_f, cam_ids, mp.looptake_cbd)
-        else:
-            continue
+    # print('Please enter command(t: take data, q:quit: ')
+    # im = np.zeros((300, 800), np.uint8)
+    # cv2.imshow('Keypressed', im)
+    #
+    # while(1):
+    #     k = cv2.waitKey(0)
+    #     im_c = im.copy()
+    #     cv2.putText(im_c,
+    #         f'{chr(k)} -> {k}\n%s'%(mp.info),(10, 40),
+    #         cv2.FONT_HERSHEY_SIMPLEX,1,(255, 255, 255), 2)
+    #     cv2.imshow('Keypressed', im_c)
+    #     if k == 27:  # Esc key to stop
+    #         mp.run=False
+    #         print('finish script...')
+    #         break
+    #     elif (k == 116 or  k == 84) and mp.run==False:#t
+    #         mp.run=True
+    #         mp.start(mp_f, cam_ids, mp.looptake_cbd)
+    #     else:
+    #         continue
     mp.terminate()
     sys.exit(1)
 
