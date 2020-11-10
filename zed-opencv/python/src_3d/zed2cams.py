@@ -3,7 +3,6 @@ import pyzed.sl as sl
 import numpy as np
 from easydict import EasyDict
 from enum import IntEnum
-import multiprocessing
 
 # reference URL : <https://stackoverflow.com/questions/60569791/zed-camera-api-example-is-causing-mysterious-segfault-mutex-lock-fault>
 
@@ -242,7 +241,7 @@ def get_windows_path(p):
 @stop_watch
 def save(menu):
   zed = menu.zed
-  now = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+  now = datetime.datetime.now().strftime('%Y%m%d%H%M%S_%f')
   p = get_windows_path(f"{menu.save_dir}/{now}")
   os.makedirs(p, exist_ok=True)
   if 'dat' in zed:
@@ -257,100 +256,37 @@ def save(menu):
     np.save(f"{p}/depth.npy", zed.mat.depth.get_data())
   if menu.take.point_cloud:
     np.save(f"{p}/pcd.npy", zed.mat.point_cloud.get_data())
-
-
-
-from  multiprocessing import Pool
-def __take_cbk(arg):
-    print(arg)
-
-
-def Foo(i, j):
-  t = np.random.randint(0, 10)
-  time.sleep(t)
-  # print(i + 100)
-  print('process :%d, loop:%d is called' % (i + 100, j))
-  return i + 100
-def __looptake(cam_id):
-    menu=init(None, cam_id)
-    print(f'menu.save_dir: {menu.save_dir}')
-    j=0
-    while True:
-        take(menu)
-        print('process :%d, loop:%d is started' % (cam_id, j))
-        time.sleep(0.2)
-        j = j + 1
-
-def take_data(root_dir):
-    class multi_take:
-      def __init__(self, interval, pron):
-        self.pool = Pool(processes=pron)
-        self.interval=interval
-      def start(self,work,cam_ids,cbk):
-        for i in cam_ids:
-            # menu, cam_serid = menu_cam
-            self.pool.apply_async(func=work,
-                                  args=(i,),
-                                  # kwds=menu,
-                                  # args=(i,i,),
-                                  callback=cbk)
-            time.sleep(0.1)
-            print("process: camera-%d is started!"%(i))
-      def terminate(self):
-        self.pool.close()
-        self.pool.terminate()
-
-    mp = multi_take(0.2, 5)
-
-    # pool = Pool(processes=5)
-    root_dir_tmp = input(f'Please set data save directory. default[{root_dir}] :')
-    if root_dir_tmp != '':
-      root_dir = root_dir_tmp
-      if not os.path.exists(root_dir):
-        os.makedirs(root_dir, exist_ok=True)
-        save_dir_fmt = root_dir + "/cam{}/"
-        print(f"{root_dir} is created.")
-
-    cameras = sl.Camera.get_device_list()
-    cam_ids=[]
-    for cam_id, cam in enumerate(cameras):
-      cam_ids.append(cam_id)
-    #   menu=init(None, cam_id)
-    #   menus.append([menu,cam.serial_number])
-    #   print(f'menu.save_dir: {menu.save_dir}')
-    print(f'available devices:{cameras}')
-    while True:
-      comm = input('Please enter command(t: take data, q:quit: ')
-      if not comm in ['t', 'q']:
-        continue
-      if comm == 't':
-        # menu = take(menu)
-        # print("take start")
-        # for i,menu_cam in enumerate(menus):
-        #   menu,cam_ser=menu_cam
-        #   __looptake(i,menu)
-        mp.start(__looptake, cam_ids, __take_cbk)
-        # for i,menu_cam in enumerate(menus):
-        #   menu,cam_ser=menu_cam
-        #   pool.apply_async(func=__looptake,
-        #                    args=(i,),
-        #                    callback=__take_cbk)
-      elif comm == 'q':
-        # print(f'available devices:{menu.zed.cam.get_device_list()}')
-        print('finish script...')
-        break
-      # else:
-      #   menu = reset_cam(menu, int(comm))
-      #   print(f'menu.save_dir: {menu.save_dir}')
-        # print(f'available devices:{menu.zed.cam.get_device_list()}')
-    for i,menu_cam in enumerate(menus):
-        menu,cam_ser=menu_cam
-        menu.zed.cam.close()
-    # pool.close()
-    # pool.terminate()
-    mp.pool.close()
-    mp.pool.terminate()
-    sys.exit(1)
-
 if __name__ == "__main__":
-  take_data(root_dir)
+  root_dir_tmp = input(f'Please set data save directory. default[{root_dir}] :')
+  if root_dir_tmp != '':
+    root_dir = root_dir_tmp
+    if not os.path.exists(root_dir):
+      os.makedirs(root_dir, exist_ok=True)
+      save_dir_fmt = root_dir + "/cam{}/"
+      print(f"{root_dir} is created.")
+  while True:
+    cam_id = input('Which camera do you want to control [0-2]?:')
+    if not cam_id in ['0', '1', '2']:
+      continue
+    cam_id = int(cam_id)
+    break
+  val = input('wait for EnterKey to start initialization...')
+  menu = init(menu, cam_id)
+  print(f'menu.save_dir: {menu.save_dir}')
+  print(f'available devices:{menu.zed.cam.get_device_list()}')
+  while True:
+    comm = input('Please enter command(t: take data, q:quit, [0-2]: reinit camera): ')
+    if not comm in ['t', 'q', '0', '1', '2']:
+      continue
+    if comm == 't':
+      menu = take(menu)
+    elif comm == 'q':
+      menu.zed.cam.close()
+      print(f'available devices:{menu.zed.cam.get_device_list()}')
+      print('finish script...')
+      sys.exit(1)
+    else:
+      menu = reset_cam(menu, int(comm))
+      print(f'menu.save_dir: {menu.save_dir}')
+      print(f'available devices:{menu.zed.cam.get_device_list()}')
+

@@ -2,7 +2,7 @@ import numpy as np
 import os, open3d,  functools, itertools, struct, time
 import vectormath as vmath
 from easydict import EasyDict
-import zed2cam
+import zed2cam_bk
 
 verbose=True
 
@@ -212,8 +212,8 @@ def apply_rotation(p):
       color = convert_bgra2rgba(color)
       depth = np.load(a.depth)
       size = f'{color.shape[1]}x{color.shape[0]}'
-      res = zed2cam.cam_reso.size2name[size]
-      intr = zed2cam.cam_reso[res]
+      res = zed2cam_bk.cam_reso.size2name[size]
+      intr = zed2cam_bk.cam_reso[res]
       pcd = calcurate_xyz(color, depth, intr)
     else:
       print(f'there is no pcd or image, please check directory: {p}')
