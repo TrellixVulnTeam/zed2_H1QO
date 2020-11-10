@@ -30,6 +30,7 @@ class multi_take:
     self.interval=interval
     self.menus=[]
     self.info="take started"
+    self.run=True
   def start(self,work,cam_ids,cbk):
     for i in cam_ids:
         self.pool.apply_async(func=work,
@@ -43,7 +44,7 @@ class multi_take:
     self.menus.append(menu)
     print(f'menu.save_dir: {menu.save_dir}')
     j=0
-    while True:
+    while (self.run):
         take(menu)
         # print('process :%d, loop:%d is started' % (cam_id, j))
         self.info = 'process :%d, loop:%d is started' % (cam_id, j)
@@ -80,7 +81,7 @@ def take_data(root_dir):
     #     break
 
     print('Please enter command(t: take data, q:quit: ')
-    im = np.zeros((100, 300), np.uint8)
+    im = np.zeros((300, 800), np.uint8)
     cv2.imshow('Keypressed', im)
     while(1):
         k = cv2.waitKey(0)
@@ -88,13 +89,14 @@ def take_data(root_dir):
         cv2.putText(
             im_c,
             f'{chr(k)} -> {k}\n%s'%(mp.info),
-            (10, 60),
+            (10, 40),
             cv2.FONT_HERSHEY_SIMPLEX,
             1,
             (255, 255, 255),
             2)
         cv2.imshow('Keypressed', im_c)
         if k == 27:  # Esc key to stop
+            mp.run=False
             print('finish script...')
             break
         elif k == 116 or  k == 84:#t
