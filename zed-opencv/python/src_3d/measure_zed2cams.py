@@ -9,18 +9,18 @@ import cv2
 
 root_dir =  "dt/output/"
 save_dir_fmt = root_dir + "/cam{}/"
-# def __looptake_cbd(arg):
-#     pass
-#
-# def __looptake2(cam_id):
-#     menu=init(None, cam_id)
-#     print(f'menu.save_dir: {menu.save_dir}')
-#     j=0
-#     while True:
-#         take(menu)
-#         print('process :%d, loop:%d is started' % (cam_id, j))
-#         time.sleep(0.2)
-#         j = j + 1
+def __looptake_cbd(arg):
+    pass
+
+def __looptake(cam_id):
+    menu=init(None, cam_id)
+    print(f'menu.save_dir: {menu.save_dir}')
+    j=0
+    while True:
+        take(menu)
+        print('process :%d, loop:%d is started' % (cam_id, j))
+        time.sleep(0.2)
+        j = j + 1
 
 def mp_f(cam_id):
   return cam_id
@@ -75,7 +75,8 @@ def take_data(root_dir):
         continue
       if comm == 't':
         mp.run = True
-        mp.start(mp_f, cam_ids, mp.looptake_cbd)
+        # mp.start(mp_f, cam_ids, mp.looptake_cbd)
+        mp.start(__looptake, cam_ids, __looptake_cbd)
       elif comm == 'q':
         mp.run = False
         print('finish script...')
