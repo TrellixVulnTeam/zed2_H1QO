@@ -5,21 +5,22 @@ import pyzed.sl as sl
 # from enum import IntEnum
 from zed2cams import init,take
 from  multiprocessing import Pool
+import cv2
 
 root_dir =  "dt/output/"
 save_dir_fmt = root_dir + "/cam{}/"
-def __looptake_cbd(arg):
-    pass
-
-def __looptake2(cam_id):
-    menu=init(None, cam_id)
-    print(f'menu.save_dir: {menu.save_dir}')
-    j=0
-    while True:
-        take(menu)
-        print('process :%d, loop:%d is started' % (cam_id, j))
-        time.sleep(0.2)
-        j = j + 1
+# def __looptake_cbd(arg):
+#     pass
+#
+# def __looptake2(cam_id):
+#     menu=init(None, cam_id)
+#     print(f'menu.save_dir: {menu.save_dir}')
+#     j=0
+#     while True:
+#         take(menu)
+#         print('process :%d, loop:%d is started' % (cam_id, j))
+#         time.sleep(0.2)
+#         j = j + 1
 
 def mp_f(cam_id):
   return cam_id
@@ -47,6 +48,8 @@ class multi_take:
         time.sleep(self.interval)
         j = j + 1
   def terminate(self):
+    for menu in self.menus:
+      menu.zed.cam.close()
     self.pool.close()
     self.pool.terminate()
 def take_data(root_dir):
@@ -63,21 +66,28 @@ def take_data(root_dir):
     cam_ids=[]
     for cam_id, cam in enumerate(cameras):
       cam_ids.append(cam_id)
-    #   menu=init(None, cam_id)
-    #   menus.append([menu,cam.serial_number])
-    #   print(f'menu.save_dir: {menu.save_dir}')
     print(f'available devices:{cameras}')
-    while True:
-      comm = input('Please enter command(t: take data, q:quit: ')
-      if not comm in ['t', 'q']:
-        continue
-      if comm == 't':
-        mp.start(mp_f, cam_ids, mp.looptake_cbd)
-      elif comm == 'q':
-        print('finish script...')
-        break
-    mp.pool.close()
-    mp.pool.terminate()
+    # while True:
+    #   comm = input('Please enter command(t: take data, q:quit: ')
+    #   if not comm in ['t', 'q']:
+    #     continue
+    #   if comm == 't':
+    #     mp.start(mp_f, cam_ids, mp.looptake_cbd)
+    #   elif comm == 'q':
+    #     print('finish script...')
+    #     break
+
+    print('Please enter command(t: take data, q:quit: ')
+    while(1):
+        k = cv2.waitKey(10)
+        if k == 27:  # Esc key to stop
+            print('finish script...')
+            break
+        elif k == 116 or  k == 84:#t
+            mp.start(mp_f, cam_ids, mp.looptake_cbd)
+        else:
+            print('Please enter command(t: take data, q:quit: ')
+    mp.terminate()
     sys.exit(1)
 
 if __name__ == "__main__":
