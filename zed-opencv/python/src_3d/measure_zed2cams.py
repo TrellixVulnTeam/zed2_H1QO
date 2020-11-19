@@ -9,7 +9,7 @@ def __looptake_cbd(arg):
     pass
 def __looptake(cam_id,r_dir):
     menu=init(None, cam_id)
-    save_dir_fmt_t = r_dir + "/cam{cam_id}/"
+    save_dir_fmt_t = r_dir + f"/cam{cam_id}/"
     menu.save_dir=save_dir_fmt_t
     print(f'menu.save_dir: {menu.save_dir}')
     j=0
