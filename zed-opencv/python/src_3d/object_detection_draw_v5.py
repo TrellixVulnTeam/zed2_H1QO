@@ -15,7 +15,7 @@ def load_model(path_mod,path_category_index):
     category_index = np.load(path_category_index, allow_pickle='TRUE').item()
     detector = hub.load(path_mod)
     return detector,category_index
-def get_absolute_file_paths(directory,ext=".npy",fn='image.npy'):
+def get_absolute_file_paths(directory,ext=".npy",fn='image.npy') -> object:
    fils_list=[]
    fn_list=[]
    dir_list=[]

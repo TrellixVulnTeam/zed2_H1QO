@@ -18,17 +18,20 @@
 /media/user1/Data/data/Data_out_20201116/
 
 '''
-import cv2,numpy as np,datetime
-import tensorflow as tf
+import cv2,numpy as np
 import pandas as pd
 from PIL import Image
 from object_detection_draw_v5 import object_detection_from_npy_all_file,load_image_from_npy
 from move_detection_v2 import detect_frame
 import os
+from skimage.measure import compare_ssim
+
+#image1,image2,difference=compute_difference_cv2(image1,image2,color=[255, 0, 0])
 def compute_difference_cv2(image1,image2,color=[0, 0, 255]):
     # compute difference
+    #print(image1.shape,image2.shape)
     difference = cv2.subtract(image1, image2)
-    # color the mask red
+    # color the mask red 
     Conv_hsv_Gray = cv2.cvtColor(difference, cv2.COLOR_BGR2GRAY)
     ret, mask = cv2.threshold(Conv_hsv_Gray, 0, 255,cv2.THRESH_BINARY_INV |cv2.THRESH_OTSU)
     difference[mask != 255] = color
@@ -36,7 +39,45 @@ def compute_difference_cv2(image1,image2,color=[0, 0, 255]):
     # add the red mask to the images to make the differences obvious
     image1[mask != 255] = color
     image2[mask != 255] = color
-    return image1,image2,difference
+    return difference,image2
+def compute_difference_ssim(before,after,color=[0, 0, 255]):
+    # Convert images to grayscale
+    before = cv2.GaussianBlur(before, (3, 3), 0)
+    after = cv2.GaussianBlur(after, (3, 3), 0)
+    before_gray = cv2.cvtColor(before, cv2.COLOR_BGR2GRAY)
+    after_gray = cv2.cvtColor(after, cv2.COLOR_BGR2GRAY)
+
+    # Compute SSIM between two images
+    (score, diff) = compare_ssim(before_gray, after_gray, full=True)
+    #print("Image similarity", score)
+
+    # The diff image contains the actual image differences between the two images
+    # and is represented as a floating point data type in the range [0,1]
+    # so we must convert the array to 8-bit unsigned integers in the range
+    # [0,255] before we can use it with OpenCV
+    diff = (diff * 255).astype("uint8")
+
+    # Threshold the difference image, followed by finding contours to
+    # obtain the regions of the two input images that differ
+    thresh = cv2.threshold(diff, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+    contours = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours = contours[0] if len(contours) == 2 else contours[1]
+
+    mask = np.zeros(before.shape, dtype='uint8')
+    filled_after = after.copy()
+
+    for c in contours:
+        area = cv2.contourArea(c)
+        if area > 40:
+            x,y,w,h = cv2.boundingRect(c)
+            cv2.rectangle(before, (x, y), (x + w, y + h), (36,255,12), 2)
+            cv2.rectangle(after, (x, y), (x + w, y + h), (36,255,12), 2)
+            cv2.drawContours(mask, [c], 0, color, -1)
+            cv2.drawContours(filled_after, [c], 0, color, -1)
+    return mask,filled_after
+# image2,_ =load_image_from_npy(rightImage)
+# image2 = cv2.cvtColor(image2, cv2.COLOR_BGR2RGB)
+# before,after,diff,mask,filled_after=compute_difference_ssim(before,after,color=[0, 0, 255])
 def get_human_lst():
     path = '/media/user1/Data/data/20201116/'
     patho = '/media/user1/Data/data/Data_out_20201116/'
@@ -214,6 +255,49 @@ def get_human_lst_each_diff_2():
             image_diff_fp = pathoful.replace('image.npy', 'moving_detection_gaus.png')
             #print(image_diff_fp) 
             pil_img.save(image_diff_fp)
+
+
+def get_human_lst_each_diff_fun(path,patho,func=None,ext='cv2'):
+    camlst = ['cam0', 'cam1', 'cam2']
+    if func is None:
+        return None,None
+    for cam in camlst:
+        df = pd.read_csv(f'{patho}/human_detect_{cam}_s.csv', header=None)
+        df_human = df[df[1] == 1]
+        image_average_fp = f'{patho}/image_average_{cam}_s.npy'
+        image_average = np.load(image_average_fp)
+
+        #image_average = cv2.GaussianBlur(image_average, (5, 5), 0)
+        image_average_gray = cv2.cvtColor(image_average, cv2.COLOR_BGR2GRAY)
+        image_average = cv2.cvtColor(image_average, cv2.COLOR_BGR2RGB)
+        cnt = len(df_human.values.tolist())
+        for i, dt in enumerate(df_human.values.tolist()):
+            path_img, flg = dt
+            print(i, i / cnt, path_img)
+            path_img = path_img.replace('/media/user1/Data/data/20201116/',
+                                        '/home/user1/yu_develop/202011161_sample/image/')
+            pathoful = path_img.replace(path, patho)
+            pathoful_fd=pathoful.replace('image.npy', '')
+            os.makedirs(pathoful_fd, exist_ok=True)
+            img, color_org = load_image_from_npy(path_img)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            # image_diff, image_diff2 = get_diff_of_two_image_2(img_gray, image_average_gray)
+            # image1, image_diff2, image_diff = compute_difference_cv2(image_average_gray, img, color=[255, 0, 0])
+            image_diff2, image_diff = func(image_average, img, color=[255, 0, 0])
+            image_diff_fp = pathoful.replace('image.npy', f'{ext}_moving_detection_diff.png')
+            cv2.imwrite(image_diff_fp, image_diff)
+
+            image_diff_fp = pathoful.replace('image.npy', f'{ext}_moving_detection_diff_2.png')
+            cv2.imwrite(image_diff_fp, image_diff2)
+
+            gray = cv2.cvtColor(image_average, cv2.COLOR_BGR2GRAY)
+            avg = gray.copy().astype("float")
+            img_detect, img_detect_concat, avg = detect_frame(img, avg)
+            pil_img = Image.fromarray(img_detect.astype(np.uint8))
+
+            image_diff_fp = pathoful.replace('image.npy', f'{ext}_moving_detection.png')
+            # print(image_diff_fp)
+            pil_img.save(image_diff_fp)
 def get_human_lst_each_cam():
     path = '/media/user1/Data/data/20201116/'
     patho = '/media/user1/Data/data/Data_out_20201116/'
@@ -281,5 +365,10 @@ if __name__ == "__main__":
     # get_human_lst_each_cam()
     # get_human_lst_each_diff()
     #get_human_lst_each_cam_2()
-    get_human_lst_each_diff_2()
+    # get_human_lst_each_diff_2()
+    path = '/home/user1/yu_develop/202011161_sample/image/'
+    patho = '/home/user1/yu_develop/202011161_sample/out/'
+    get_human_lst_each_diff_fun(path, patho, func=compute_difference_cv2, ext='cv2')
+    get_human_lst_each_diff_fun(path, patho, func=compute_difference_ssim, ext='ssim')
     pass
+

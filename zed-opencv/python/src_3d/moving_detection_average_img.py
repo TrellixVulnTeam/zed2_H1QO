@@ -18,8 +18,7 @@
 
 
 '''
-import cv2,numpy as np,datetime
-import tensorflow as tf
+import cv2,numpy as np
 import pandas as pd
 from PIL import Image
 from object_detection_draw_v5 import object_detection_from_npy_all_file,load_image_from_npy

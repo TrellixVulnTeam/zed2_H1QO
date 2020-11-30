@@ -17,6 +17,8 @@ cv2.imwrite(f'{path}/image2.png', after)
 #https://stackoverflow.com/questions/56183201/detect-and-visualize-differences-between-two-images-with-opencv-python
 def compute_difference_ssim(before,after,color=[0, 0, 255]):
     # Convert images to grayscale
+    before = cv2.GaussianBlur(before, (3, 3), 0)
+    after = cv2.GaussianBlur(after, (3, 3), 0)
     before_gray = cv2.cvtColor(before, cv2.COLOR_BGR2GRAY)
     after_gray = cv2.cvtColor(after, cv2.COLOR_BGR2GRAY)
 

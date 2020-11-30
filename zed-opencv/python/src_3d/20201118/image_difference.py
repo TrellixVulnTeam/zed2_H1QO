@@ -7,7 +7,6 @@ leftImage=f'{path}/image_average_cam0.png'
 rightImage=f'{path}/image.npy'
 image1 = cv2.imread(leftImage)
 image2,_ =load_image_from_npy(rightImage)
-
 image2 = cv2.cvtColor(image2, cv2.COLOR_BGR2RGB)
 cv2.imwrite(f'{path}/image2.png', image2)
 #https://stackoverflow.com/questions/56183201/detect-and-visualize-differences-between-two-images-with-opencv-python
