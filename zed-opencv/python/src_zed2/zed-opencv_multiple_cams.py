@@ -163,7 +163,6 @@ def save_left_image(zed, filename) :
     zed.retrieve_image(image_sl_left, sl.VIEW.LEFT)
     image_cv_left = image_sl_left.get_data()
     cv2.imwrite(filename, image_cv_left)
-    return image_cv_left
 def get_camera_intrintic_info(zed):
     cx = zed.get_camera_information().calibration_parameters.left_cam.cx
     cy = zed.get_camera_information().calibration_parameters.left_cam.cy
@@ -232,7 +231,7 @@ def process_key_event(zed, key,zed_pose, zed_sensors,name_cam):
             filename = path + prefix_reconstruction + "-%06d.depth"% (count_save)+'-'+ name_cam
             save_depth(zed, filename)
             filename = path + prefix_reconstruction + "-%06d.color"% (count_save)+'-'+ name_cam
-            image_ocv_left = save_left_image(zed, filename + ".jpg")
+            save_left_image(zed, filename + ".jpg")
             # cv2.imshow("Image", image_ocv_left)
             #count_save+=1
             # filename = path + prefix_point_cloud + str(count_save)

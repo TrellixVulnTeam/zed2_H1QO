@@ -2,7 +2,7 @@ import open3d as o3d
 import numpy as np
 from  datetime import datetime as dt
 #http://www.open3d.org/docs/latest/tutorial/Advanced/multiway_registration.html
-
+#https://blog.csdn.net/u013019296/article/details/109760162
 def add_color_normal(pcd): # in-place coloring and adding normal
     # pcd.paint_uniform_color(np.random.rand(3))
     size = np.abs((pcd.get_max_bound() - pcd.get_min_bound())).max() / 30
