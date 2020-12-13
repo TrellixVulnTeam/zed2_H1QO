@@ -6,6 +6,9 @@
       <sourceFolder url="file://$MODULE_DIR$/python/src_20201021" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/python/src_3d" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/python/src_3d/pointcloud_merge" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/python/src_3d/pointcloud_merge/test" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/python/src_3d/reconstruction_system/utility" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/python/src_3d/reconstruction_system" isTestSource="false" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.6 (tf2)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

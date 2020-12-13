@@ -79,7 +79,7 @@ class ransac_icp:
         pcds = []
         for f in pcd_files:
             pcd = py3d.io.read_point_cloud(f)
-            pcd=self.remove_noise_ply(pcd)
+            # pcd=self.remove_noise_ply(pcd)
             # pcd=self.remove_noise_ply(pcd)
             # pcd=self.remove_noise_ply(pcd)
             self.add_color_normal(pcd)
@@ -185,7 +185,7 @@ class ransac_icp:
         return pcd
 
     def remove_noise_ply(self,pcd):
-        # (1) Load a ply point cloud, print it, and render it
+        # (1) Load a ply point cloud, print it,  and render it
         print("Load a ply point cloud, print it, and render it")
         # pcd = py3d.io.read_point_cloud(fn_pcd)
         # py3d.visualization.draw_geometries([pcd])
@@ -213,12 +213,12 @@ def main_ransac_icp():
     ri=ransac_icp()
 
 
-    id='0047'
-
+    id='0000'
     ply0=f'C:/00_work/05_src/data/20201124/202011161_sample/ply/cam0/20201116133246_027942/pcd_mask_mergeid_{id}.ply'
     ply1=f'C:/00_work/05_src/data/20201124/202011161_sample/ply/cam1/20201116133246_072897/pcd_mask_mergeid_{id}.ply'
     ply2=f'C:/00_work/05_src/data/20201124/202011161_sample/ply/cam2/20201116133246_079488/pcd_mask_mergeid_{id}.ply'
 
+    id='0001'
     ply0=f'C:/00_work/05_src/data/20201124/202011161_sample/ply/cam0/20201116133925_495618/pcd_mask_mergeid_{id}.ply'
     ply1=f'C:/00_work/05_src/data/20201124/202011161_sample/ply/cam1/20201116133925_659685/pcd_mask_mergeid_{id}.ply'
     ply2=f'C:/00_work/05_src/data/20201124/202011161_sample/ply/cam2/20201116133925_340958/pcd_mask_mergeid_{id}.ply'
@@ -227,7 +227,8 @@ def main_ransac_icp():
     # py3d.visualization.draw_geometries(pcds, "input pcds")
 
     size = np.abs((pcds[0].get_max_bound() - pcds[0].get_min_bound())).max() / 30
-
+    if size == 0:
+        size=0.02
     pcd_aligned = ri.align_pcds(pcds, size)
     all_points = []
     all_colors = []
@@ -306,8 +307,8 @@ def main():
 if __name__ == "__main__":
     # main()
     main_ransac_icp()
-    fn_pcd='C:/00_work/05_src/data/20201124/202011161_sample/ply/cam0/20201116133925_495618/pcd_mask_mergeid_0047.ply'
-    fn_pcd = 'C:/00_work/05_src/data/20201124/202011161_sample/ply/cam0/20201116133246_027942/pcd_mask_mergeid_0000.ply'
+    # fn_pcd='C:/00_work/05_src/data/20201124/202011161_sample/ply/cam0/20201116133925_495618/pcd_mask_mergeid_0047.ply'
+    # fn_pcd = 'C:/00_work/05_src/data/20201124/202011161_sample/ply/cam0/20201116133246_027942/pcd_mask_mergeid_0000.ply'
     #test
     # remove_noise_ply(fn_pcd)
     # remove_noise_mask()

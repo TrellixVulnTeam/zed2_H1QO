@@ -1,0 +1,42 @@
+
+# 3D視点の合成
+
+open3d icp registration
+	http://www.open3d.org/docs/0.7.0/tutorial/Basic/icp_registration.html
+	
+	Point-to-point ICP
+	Point-to-plane ICP
+	
+
+FPFH特徴量
+	https://qiita.com/tttamaki/items/14ac652f4030751ad2f1
+
+FPFH特徴量 + ICP
+	https://qiita.com/tttamaki/items/648422860869bbccc72d
+
+RANZAC + ICP
+	https://qiita.com/n_chiba_/items/fc9605cde5c19a8c7dad#%E3%83%A1%E3%82%A4%E3%83%B3
+
+(高レベル。)
+SHOT特徴量 + ICP
+	(PCLで三次元物体認識)
+	https://qiita.com/hakuturu583/items/3e82acb083779f388640
+	
+	python-pclでC++のサンプルロジックを実装。
+	★ python-pclのインストール方法、サンプルは別途提示予定。
+
+SHOT特徴量 + RANZAC + ICP
+	参考サイトなし。
+
+# 背景3D化
+
+SLAMをがっつり使っちゃう。
+	https://qiita.com/saitosasaki/items/ad34d6d31bdab43bf879
+
+ZED2 & ROS
+	https://www.stereolabs.com/docs/ros/
+	roslaunch zed_wrapper zed2.launch svo_file:=/path/to/file.svo
+	
+	↑のsvoファイルを使って3D背景のカラー化？
+	https://www.stereolabs.com/docs/spatial-mapping/
+	
