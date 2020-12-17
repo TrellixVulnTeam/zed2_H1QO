@@ -299,8 +299,8 @@ def main() :
         image_size = cams.zed_list[index].get_camera_information().camera_resolution
         image_size.width = image_size.width /2
         image_size.height = image_size.height /2# Declare your sl.Mat matrices
-        image_zed = cams.left_list[index](image_size.width, image_size.height, sl.MAT_TYPE.U8_C4)
-        depth_image_zed = cams.depth_list[index](image_size.width, image_size.height, sl.MAT_TYPE.U8_C4)
+        image_zed = sl.Mat(image_size.width, image_size.height, sl.MAT_TYPE.U8_C4)
+        depth_image_zed = sl.Mat(image_size.width, image_size.height, sl.MAT_TYPE.U8_C4)
         cams.image_size_list.append(image_size)
         cams.image_zed_list.append(image_zed)
         cams.depth_image_zed_list.append(depth_image_zed)

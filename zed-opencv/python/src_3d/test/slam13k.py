@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 import cv2
-# import quaternion
-import  pyquaternion as  quaternion
+import quaternion
+# import  pyquaternion as  quaternion
 from transforms3d.quaternions import quat2mat, mat2quat
 from testply import convert_xyzrgb_to_ply,make_pcd
 import open3d
@@ -19,7 +19,7 @@ depthScale = 1000.0
 
 colorImgs, depthImgs = [], []
 
-bp='D:/02_AIPJ/004_ISB/zed2/zed-opencv/python/dt/data_test/'
+bp='C:/00_work/05_src/zed2/zed-opencv/python/dt/data_test/'
 # read pose.txt
 # fn_d='reconstruction-000005.depth-ZED_22378008.png'
 # img=cv2.imread(f'{bp}/{fn_d}')
@@ -50,9 +50,12 @@ with open(f'{bp}pose.txt', 'r') as f:
 view = []
 colors_all=[]
 points_all=[]
-for i in range(5):
+for i in range(3):
     fn=f'{bp}reconstruction-00000{i}.cloud-ZED_22378008.ply'
     ply=open3d.io.read_point_cloud(fn)
+    # fn=f'{bp}reconstruction-00000{i}.pose-ZED_22378008.csv'
+    # trans_intro=np.loadtxt(fn)
+    # ply=ply_t.transform(trans_intro)
     points=np.array(ply.points)
     colors=np.array(ply.colors)
     points_1=np.hstack((points,np.ones((points.shape[0],1))))
