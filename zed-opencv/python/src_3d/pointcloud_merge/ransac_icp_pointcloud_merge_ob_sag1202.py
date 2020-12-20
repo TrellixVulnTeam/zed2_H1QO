@@ -4,6 +4,7 @@ import open3d as py3d
 import cv2
 import os, itertools
 import datetime
+#pip install open3d==0.10.0.1
 # import pcl
 import matplotlib.pyplot as plt
 class ransac_icp:
@@ -130,12 +131,14 @@ class ransac_icp:
                                 option=option)
 
         # 推定した姿勢で点群を変換
+        translst=[]
         for pcd_id in range(n_pcds):
             trans = pose_graph.nodes[pcd_id].pose
             pcds[pcd_id].transform(trans)
+            translst.append(trans)
 
 
-        return pcds
+        return pcds,translst
 
     def make_pcd(self,points, colors):
       pcd = py3d.geometry.PointCloud()
@@ -240,7 +243,7 @@ def main_ransac_icp(id,fuchi,pose):
         pcdn=ri.add_color_normal(pcd,size)
         pcdsn.append(pcdn)
 
-    pcd_aligned = ri.align_pcds(pcdsn, size)
+    pcd_aligned,translst = ri.align_pcds(pcdsn, size)
     all_points = []
     all_colors = []
     for i, pcd in enumerate(pcd_aligned):
