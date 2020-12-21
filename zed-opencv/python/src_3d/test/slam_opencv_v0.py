@@ -1,13 +1,9 @@
 import numpy as np
 import cv2
 import cv2 as cv
-# import quaternion
-import  pyquaternion as  quaternion
-from transforms3d.quaternions import quat2mat, mat2quat
-# from testply import convert_xyzrgb_to_ply,make_pcd
+import quaternion
+# import  pyquaternion as  quaternion
 import open3d
-from IPython.display import Image, display
-from ransac_icp_pointcloud_merge_ob_sag1202 import ransac_icp
 # import pcl
 #python -m pip install numpy-quaternion
 #pip install pyquaternion
@@ -22,45 +18,16 @@ depthScale = 1000.0
 colorImgs, depthImgs = [], []
 
 bp='data/'
-
-
 rgb1=cv2.imread(f"./{bp}/rgb1.png")
 rgb2=cv2.imread(f"./{bp}/rgb2.png")
 depth1=cv2.imread(f"./{bp}/depth1.png")[:,:,0]
 depth2=cv2.imread(f"./{bp}/depth2.png")[:,:,0]
-
-#-- Step 1: Detect the keypoints using SURF Detector
-# https://pystyle.info/opencv-feature-matching/
-def computeKeyPointsAndDesp(src):
-    minHessian = 400
-    detector = cv.xfeatures2d_SURF.create(hessianThreshold=minHessian)
-    keypoints = detector.detect(src)
-    #-- Draw keypoints
-    img_keypoints = np.empty((src.shape[0], src.shape[1], 3), dtype=np.uint8)
-    cv.drawKeypoints(src, keypoints, img_keypoints)
-    #-- Show detected (drawn) keypoints
-    cv.imshow('SURF Keypoints', img_keypoints)
-    cv.show()
-def imshow(img):
-    """ndarray 配列をインラインで Notebook 上に表示する。
-    """
-    ret, encoded = cv2.imencode(".jpg", img)
-    display(Image(encoded))
-def computeKeyPointsAndDesp1(img):
-    # 特徴点を検出する。
-    # OBR 特徴検出器を作成する。
-    detector = cv2.ORB_create()
-    kp = detector.detect(img)
-    # 特徴点を描画する。
-    dst = cv2.drawKeypoints(img, kp, None)
-    kp, desc = detector.compute(img, kp)
-    print(len(kp), desc.shape)
-    # 特徴点を検出する。
-    kp, desc = detector.detectAndCompute(img, None)
-    print(len(kp), desc.shape)
-    # imshow(dst)
-    # cv.show()
-#https://pystyle.info/opencv-feature-matching/
+'''
+https://pystyle.info/opencv-feature-matching/
+https://www.366service.com/jp/qa/ed8c0298cc30a02ee80c3d9ecef63a69
+https://programtalk.com/python-examples/cv2.solvePnP/
+'''
+#参照資料
 def computeKeyPointsAndMaches(img1,img2):
     # OBR 特徴量検出器を作成する。
     detector = cv2.ORB_create()
@@ -122,30 +89,6 @@ def point2dTo3d(point):
     y=(point[1]-cy)*z/fy
     return [x,y,z]
 def get_good_matches_pts(goodMatches,kp1,kp2):
-    '''
-     // 第一个帧的三维点
-    vector<cv::Point3f> pts_obj;
-    // 第二个帧的图像点
-    vector< cv::Point2f > pts_img;
-
-    // 相机内参
-    for (size_t i=0; i<goodMatches.size(); i++)
-    {
-        // query 是第一个, train 是第二个
-        cv::Point2f p = frame1.kp[goodMatches[i].queryIdx].pt;
-        // 获取d是要小心！x是向右的，y是向下的，所以y才是行，x是列！
-        ushort d = frame1.depth.ptr<ushort>( int(p.y) )[ int(p.x) ];
-        if (d == 0)
-            continue;
-        pts_img.push_back( cv::Point2f( frame2.kp[goodMatches[i].trainIdx].pt ) );
-
-        // 将(u,v,d)转成(x,y,z)
-        cv::Point3f pt ( p.x, p.y, d );
-        cv::Point3f pd = point2dTo3d( pt, camera );
-        pts_obj.push_back( pd );
-    }
-
-    '''
     pts_obj1=[]
     pts_img=[]
     for i, goodMatch in enumerate(goodMatches):
@@ -173,17 +116,11 @@ def get_good_matches_pts(goodMatches,kp1,kp2):
     distCoeffs = np.array(distCoeffs, dtype=np.float64)
 
     _, rvec0, T0 = cv2.solvePnP(pts_obj, pts_img, cameraMatrix, distCoeffs=distCoeffs)
-    # rvec0 = np.array(ini_pose[i, 0:3].cpu().view(3, 1))
-    # T0 = np.array(ini_pose[i, 3:6].cpu().view(3, 1))
     _, rVec, tVec = cv2.solvePnP(pts_obj, pts_img, cameraMatrix, distCoeffs=None,
                                  flags=cv.SOLVEPNP_ITERATIVE, useExtrinsicGuess=False, rvec=rvec0, tvec=T0)
-    #https://www.366service.com/jp/qa/ed8c0298cc30a02ee80c3d9ecef63a69
+
     rotM = cv2.Rodrigues(rVec)[0]
-    # rotM=np.array(rotM).T
-    # rotM = -np.array(rotM).T * np.array(tVec)
-    # rotation_mat, _ = cv2.Rodrigues(rVec)
     pose_mat = cv2.hconcat((rotM, tVec))
-    #https://programtalk.com/python-examples/cv2.solvePnP/
     pose_mat=cv2.vconcat((pose_mat,np.array([[0.0,0.0,0.0,1.0]])))
     return pose_mat
 kp1,kp2,goodMatches=computeKeyPointsAndMaches(rgb1,rgb2)
@@ -191,11 +128,11 @@ pose_mat=get_good_matches_pts(goodMatches,kp1,kp2)
 cloud1=image2PointCloud(rgb1,depth1)
 cloud2=image2PointCloud(rgb2,depth2)
 
-open3d.io.write_point_cloud('pcd_merge_org1.ply', cloud1)
-open3d.io.write_point_cloud('pcd_merge_org2.ply', cloud2)
+open3d.io.write_point_cloud('pcd_org1.ply', cloud1)
+open3d.io.write_point_cloud('pcd_org2.ply', cloud2)
 
-cloud2t=cloud2.transform(pose_mat)
 cloud1t=cloud1.transform(pose_mat)
-open3d.io.write_point_cloud('pcd_merge_1t.ply', cloud1t)
-open3d.io.write_point_cloud('pcd_merge_2t.ply', cloud2t)
-# open3d.io.write_point_cloud('pcd_merge.ply', pcd)
+# cloud2t=cloud2.transform(pose_mat)
+open3d.io.write_point_cloud('pcd_trans_1.ply', cloud1t)
+pcd=merge_points_cloud([cloud1t,cloud2])
+open3d.io.write_point_cloud('pcd_merge.ply', pcd)

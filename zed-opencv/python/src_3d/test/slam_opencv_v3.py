@@ -335,5 +335,9 @@ merge_dt()
 '''
 https://www.learnopencv.com/head-pose-estimation-using-opencv-and-dlib/
 camera pose
+https://www.stereolabs.com/docs/positional-tracking/
 https://www.stereolabs.com/docs/positional-tracking/coordinate-frames/
+
+spatial mapping
+https://www.stereolabs.com/docs/spatial-mapping/using-mapping/
 '''
