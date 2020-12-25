@@ -303,6 +303,35 @@ def computeKeyPointsAndMachesSift(img1,img2):
     dst = cv2.drawMatches(img1, kp1, img2, kp2, good_matches, None)
     # cv2.imwrite("data/dst2.jpg",dst)
     return kp1,kp2,good_matches,dst
+def computeKeyPointsAndMachesSift_2(img1,img2):
+    # OBR 特徴量検出器を作成する。
+    img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
+    img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+
+    # sift
+    detector = cv2.xfeatures2d.SIFT_create()
+    # 特徴点を検出する。
+    kp1, desc1 = detector.detectAndCompute(img1, None)
+    kp2, desc2 = detector.detectAndCompute(img2, None)
+    # マッチング器を作成する。
+    # bf = cv2.BFMatcher(cv2.NORM_L1, crossCheck=True)
+    bf = cv.BFMatcher()
+    # マッチングを行う。
+    matches = bf.knnMatch(desc1, desc2, k=2)
+    # matches = bf.match(desc1, desc2)
+    # レシオテストを行う。
+    # matches = sorted(matches, key=lambda x: x.distance)
+    good_matches = []
+    thresh = 0.9
+    # good_matches=matches[:50]
+    for first, second in matches:
+        if first.distance < second.distance * thresh:
+            good_matches.append(first)
+    print("good_matches:",len(good_matches))
+    # マッチング結果を描画する。
+    dst = cv2.drawMatches(img1, kp1, img2, kp2, good_matches, None)
+    # cv2.imwrite("data/dst2.jpg",dst)
+    return kp1,kp2,good_matches,dst
 def merge_rgb_img_msk(id,bp,po,pose):
     basep = f'{bp}/{pose}'
     baseout = f'{po}/{pose}'
@@ -317,8 +346,8 @@ def merge_rgb_img_msk(id,bp,po,pose):
     # ret, rgb_grey_1 = cv2.threshold(rgb_grey_1, 0, 255, cv2.THRESH_OTSU)
     # ret, rgb_grey_2 = cv2.threshold(rgb_grey_2, 0, 255, cv2.THRESH_OTSU)
 
-    kp1, kp2, goodMatches ,dst= computeKeyPointsAndMaches_ORB(rgb1, rgb2)
-    # kp1, kp2, goodMatches ,dst= computeKeyPointsAndMachesSift(rgb1, rgb2)
+    # kp1, kp2, goodMatches ,dst= computeKeyPointsAndMaches_ORB(rgb1, rgb2)
+    kp1, kp2, goodMatches ,dst= computeKeyPointsAndMachesSift(rgb1, rgb2)
     cv2.imwrite(f"{basep}/dsp_%04d.jpg"%(id),dst)
 def preprocess_dt():
     bp='data/'
