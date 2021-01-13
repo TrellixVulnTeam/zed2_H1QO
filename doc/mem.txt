@@ -1,0 +1,354 @@
+windows user:807028 
+mail:s.yu@isb.co.jp
+salesforce:807028@isb.co.jp
+           1Ysl1234
+013-R2010-203\user1
+isb-135
+
+下向さん：しもむかい
+小松原さん：こまつばら
+
+https://github.com/andyzeng/tsdf-fusion-python
+
+
+git config --global core.autoCRLF false
+
+
+
+. /C/Users/807028/Anaconda3/etc/profile.d/conda.sh
+conda activate tf2
+conda install -c anaconda cudatoolkit
+postgres download
+https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
+対策説明
+https://kb.tableau.com/articles/issue/error-while-executing-the-query-appears-when-connecting-to-postgresql-version-12?lang=ja-jp
+odbcd install
+ https://www.postgresql.org/ftp/odbc/versions/msi/
+tableau HP
+https://www.tableau.com/ja-jp/support/drivers?_fsi=1gZui8Pr&_ga=2.257667083.1413277818.1602726268-1992581584.1601513321&_fsi=1gZui8Pr
+5432
+123
+
+Host：repro-dev-redshift.cwzqgfastffs.ap-northeast-1.redshift.amazonaws.com
+Database：redshiftdb
+Port：5439
+User：repro
+Password：RedshiftDB1
+■ Tableau Server
+https://api11.g21.mota.ppnhn.hir-multimedia.com/
+ログインユーザ：tabadmin
+パスワード：f393tkH!PZkuX2PG
+
+
+
+カメラセット（左）						5.30 			120			10			1.50 		
+z=1.5
+y=r*cos(Θ)
+x=r*cos(γ)
+でもγの値はないですね。
+
+
+
+WBS
+3D部分対応
+teliwork
+12月中旬までに
+
+
+
+
+
+
+ユーザー名 : 于　勝龍  
+ログインID : s.yu
+パスワード : cacha82070
+https://sgi.cachatto.jp
+
+ログイン
+sgi.cachatto.jp
+64265
+s.yu
+1::1234
+
+
+演算サーバー：192.168.11.4
+于さんUbuntu：192.168.11.22
+
+ssh user1:isb-135@192.168.11.22
+ssh user1@192.168.11.22
+ssh user1@192.168.11.11
+@渡部絢 さん
+
+おはようございます。1月12日　8時45分　テレワーク開始します。
+作業内容はslam方法での点群マージの調査を続きます。
+
+
+お疲れ様です。1月12日　テレワーク終了します。
+本日作業内容について、slamの方法で点群マージの調査しました。
+詳細内容は下記ファイルを参照してください。
+NICT AI\99.受け渡し\依頼履歴参照資料\于の日報.txt。
+
+01/12(于）
+本日作業について、下記通りです。
+作業目的：positional-trackingの資料を参照して、点群マージのtransform matrixを取得したいです。
+技術ポイント
+①positional-tracking
+②oritation、positionデータ取得
+③imuデータ検証
+④データ取り方と注意点
+  資料【zed2カメラ姿勢データ取得について_20210106.xlsx】を参照してください。
+
+下記資料を参照して、カメラの姿勢matrixを使って、点群マージの試験を実施します。
+https://www.stereolabs.com/docs/positional-tracking/
+https://www.stereolabs.com/docs/positional-tracking/coordinate-frames/
+上記資料を参照して、データの取り方を考えて、
+データ取るプログラムを作成しました。
+連絡事項：
+　ubuntuの環境が崩れたので、データ取る試験の実施ができなかったので、
+よければ、そちら側データ取るについて、ご協力をお願いしたいです。
+①データ取り方：NICT AI\99.受け渡し\20210106\fromYUのファイル【zed2カメラ姿勢データ取得について_20210106.xlsx】
+　　を参照してください。
+②参照資料
+https://www.stereolabs.com/docs/positional-tracking/
+https://www.stereolabs.com/docs/positional-tracking/coordinate-frames/
+③データ取るプログラム：
+NICT AI\99.受け渡し\20210112\fromYU\zed2_multiple_cams_0112.py
+※プログラムのテストが不純分ですが、エラーがあるかもしれない、そちらが修正が難しい場合、
+ご連絡ください。
+
+
+資料みる論理上上記方法で、transform matrix取得可能です。
+課題
+①精度アップ,imuデータについて、精度期待しています。
+②coordinate_units=sl.UNIT.MILLIMETERの方法で、精度アップ
+③multi cameraの場合、opencvなどで較正（calibration）の作業が必要があると思います。
+
+
+pythonプログラムを作成しています。関連資料下記通りです。
+※既存python OSSがないですが、実装とテストの時間がかかます。
+https://blog.csdn.net/Wayne__Yang/article/details/72598628
+https://docs.opencv.org/3.4/d7/d66/tutorial_feature_detection.html
+https://cvg.ethz.ch/teaching/cvl/2012/Tutorial-OpenCV.pdf
+
+
+
+
+https://github.com/openMVG/awesome_3DReconstruction_list
+https://github.com/raulmur/ORB_SLAM2
+https://github.com/mp3guy/ElasticFusion
+docker install https://qiita.com/tkyonezu/items/0f6da57eb2d823d2611d
+ sudo add-apt-repository    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable edge test"
+ sudo docker build -t slam/nginx:1.0 .
+docker build ./ -t slam3d
+docker run slam3d
+docker exec -it slam3d /bin/bash
+docker exec -it bb /bin/bash
+■docker copy
+ docker commit myslam  myslam31
+  docker run -it myslam31 /bin/bash
+■sudo docker exec -it myslam /bin/bash
+docker run --publish 8000:8080 --detach --name bb slam3d
+■
+opencv install 
+https://takacity.blog.fc2.com/blog-entry-325.html
+■pcl　install
+apt install libpcl-dev
+show libpcl-dev
+apt install cmake
+sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list'
+
+wget https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -O - | sudo apt-key add -
+
+sudo apt-get update
+
+sudo apt-get install ros-indigo-desktop-full
+ apt-get install ros-indigo-octomap ros-indigo-octomap-mapping ros-indigo-octomap-msgs ros-indigo-octomap-ros ros-indigo-octomap-rviz-plugins ros-indigo-octomap-server
+
+mkdir build
+cd build
+cmake ..
+make
+./dense_mapping ../test_data
+
+コンパイルが終わるまで３０分ぐらいかかりました。
+sudo make install
+sudo /bin/bash -c 'echo "/usr/local/lib" > /etc/ld.so.conf.d/opencv.conf'
+sudo  ldconfig
+
+
+
+
+
+
+https://blog.csdn.net/hansry/article/details/78035969
+実施
+https://www.it610.com/article/1297358433401511936.htm
+
+https://github.com/karaage0703/open3d_ros
+https://gis.stackexchange.com/questions/272433/editing-lidar-point-cloud-to-remove-noise-outliers-present-below-and-above-groun
+https://github.com/mrakotosaon/pointcleannet
+
+ pip install torch==1.5.0+cpu torchvision==0.6.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+ 
+C:\00_work\05_src\data\20201202_shiyoko_6f\merge_fuchi10\d4_a15_h1.5
+C:\00_work\05_src\data\20201202_shiyoko_6f\merge_fuchi10\d4_a30_h1.5
+C:\00_work\05_src\data\20201202_shiyoko_6f\merge_fuchi10\d4_a45_h1.5
+
+python
+2.3  FastBilateralFilter、BilateralFilter
+DoN算法
+https://github.com/strawlab/python-pcl/blob/master/examples/official/Registration/alignment_prerejective.py
+https://github.com/strawlab/python-pcl
+
+
+https://ci.appveyor.com/project/Sirokujira/python-pcl-iju42/build/job/3vds3xogrsax1e8t/artifacts
+ 1.8.1, PCL_VERSION=1.8,
+pip install python_pcl-XXX.whl
+pip install python_pcl-0.3.1-cp36-cp36m-win_amd64.whl
+https://github.com/PointCloudLibrary/pcl/releases/download/pcl-1.8.1/PCL-1.8.1-AllInOne-msvc2017-win64.exe
+http://www.tarnyko.net/repo/gtk3_build_system/gtk+-bundle_3.6.4-20130513_win64.zip
+
+
+export GTK_ROOT="/c/00_work/05_src/python-pcl-iju42/dl/gtk+-bundle_3.6.4-20130513_win64"
+export PCL_ROOT="/c/Program Files/PCL 1.8.1"
+export OPEN_NI2_ROOT="/c/Program Files/OpenNI2"
+export VTK_ROOT="/c/Program Files/PCL 1.8.1/3rdParty/VTK"
+PATH=${GTK_ROOT}:${PCL_ROOT}/bin/:${OPEN_NI2_ROOT}/Tools:${VTK_ROOT}/bin:${PATH}
+
+
+PATH=${GTK_ROOT}:${PATH}
+https://mebee.info/2020/07/18/post-13597/
+
+
+
+
+
+slam pointcloud merge url
+https://blog.csdn.net/Hansry/article/details/78035969
+https://www.learnopencv.com/head-pose-estimation-using-opencv-and-dlib/
+
+https://www.analyticsvidhya.com/blog/2019/10/detailed-guide-powerful-sift-technique-image-matching-python/
+■deep learning to find feather point
+https://blog.csdn.net/heiyaheiya/article/details/90754569
+https://blog.francium.tech/feature-detection-and-matching-with-opencv-5fd2394a590
+
+
+
+
+
+'''
+https://www.learnopencv.com/head-pose-estimation-using-opencv-and-dlib/
+camera pose
+https://www.stereolabs.com/docs/positional-tracking/
+https://www.stereolabs.com/docs/positional-tracking/coordinate-frames/
+
+spatial mapping
+https://www.stereolabs.com/docs/spatial-mapping/using-mapping/
+'''
+
+
+
+mZedParams.camera_fps = 30;
+
+https://github.com/stereolabs/zed-openpose/blob/master/src/main.cpp
+// Set configuration parameters for the ZED
+    InitParameters initParameters;
+    initParameters.camera_resolution = RESOLUTION::HD2K;
+    initParameters.depth_mode = DEPTH_MODE::ULTRA; // Might be GPU memory intensive combine with openpose
+    initParameters.coordinate_units = unit;
+    initParameters.coordinate_system = COORDINATE_SYSTEM::RIGHT_HANDED_Y_UP;
+    initParameters.sdk_verbose = 0;
+    initParameters.depth_stabilization = true;
+    initParameters.svo_real_time_mode = 1;
+
+
+
+https://staff.aist.go.jp/kanezaki.asako/pdf/SSII2016_AsakoKanezaki.pdf
+12・25
+https://github.com/intel-isl/Open3D/issues/791
+https://github.com/IntelRealSense/librealsense/blob/master/wrappers/python/examples/box_dimensioner_multicam/calibration_kabsch.py
+
+
+
+
+https://www.ncnynl.com/archives/201701/1253.html
+https://www.programmersought.com/article/9003104792/
+
+
+■zed2カメラの追跡
+https://www.stereolabs.com/docs/positional-tracking/
+https://www.stereolabs.com/docs/positional-tracking/using-tracking/
+
+
+https://www.stereolabs.com/docs/positional-tracking/using-tracking/
+To improve tracking results, use high FPS video modes such as HD720 and WVGA.
+
+
+
+
+https://www.stereolabs.com/docs/positional-tracking/using-tracking/
+zed_pose = sl.Pose()
+if zed.grab(runtime_parameters) == SUCCESS :
+        # Get the pose of the camera relative to the world frame
+        state = zed.get_position(zed_pose, sl.REFERENCE_FRAME.FRAME_WORLD)
+        # Display translation and timestamp
+        py_translation = sl.Translation()
+        tx = round(zed_pose.get_translation(py_translation).get()[0], 3)
+        ty = round(zed_pose.get_translation(py_translation).get()[1], 3)
+        tz = round(zed_pose.get_translation(py_translation).get()[2], 3)
+        print("Translation: tx: {0}, ty:  {1}, tz:  {2}, timestamp: {3}\n".format(tx, ty, tz, zed_pose.timestamp))
+        #Display orientation quaternion
+        py_orientation = sl.Orientation()
+        ox = round(zed_pose.get_orientation(py_orientation).get()[0], 3)
+        oy = round(zed_pose.get_orientation(py_orientation).get()[1], 3)
+        oz = round(zed_pose.get_orientation(py_orientation).get()[2], 3)
+        ow = round(zed_pose.get_orientation(py_orientation).get()[3], 3)
+        print("Orientation: ox: {0}, oy:  {1}, oz: {2}, ow: {3}\n".format(ox, oy, oz, ow))
+https://www.stereolabs.com/docs/tutorials/positional-tracking/
+i = 0
+zed_pose = sl.Pose()
+runtime_parameters = sl.RuntimeParameters()
+while i < 1000:
+    if zed.grab(runtime_parameters) == sl.ERROR_CODE.SUCCESS:
+        # Get the pose of the left eye of the camera with reference to the world frame
+        zed.get_position(zed_pose, sl.REFERENCE_FRAME.WORLD)
+ 
+        # Display the translation and timestamp
+        py_translation = sl.Translation()
+        tx = round(zed_pose.get_translation(py_translation).get()[0], 3)
+        ty = round(zed_pose.get_translation(py_translation).get()[1], 3)
+        tz = round(zed_pose.get_translation(py_translation).get()[2], 3)
+        print("Translation: Tx: {0}, Ty: {1}, Tz {2}, Timestamp: {3}\n".format(tx, ty, tz, zed_pose.timestamp.get_milliseconds()))
+ 
+        # Display the orientation quaternion
+        py_orientation = sl.Orientation()
+        ox = round(zed_pose.get_orientation(py_orientation).get()[0], 3)
+        oy = round(zed_pose.get_orientation(py_orientation).get()[1], 3)
+        oz = round(zed_pose.get_orientation(py_orientation).get()[2], 3)
+        ow = round(zed_pose.get_orientation(py_orientation).get()[3], 3)
+        print("Orientation: Ox: {0}, Oy: {1}, Oz {2}, Ow: {3}\n".format(ox, oy, oz, ow))
+■IMU
+https://www.stereolabs.com/docs/tutorials/positional-tracking/
+sensors_data = sl.SensorsData()
+zed.get_sensors_data(sensors_data, sl.TIME_REFERENCE.IMAGE)
+zed_imu = zed_sensors.get_imu_data()
+# Get IMU orientation
+zed_imu_pose = sl.Transform()
+ox = round(zed_imu.get_pose(zed_imu_pose).get_orientation().get()[0], 3)
+oy = round(zed_imu.get_pose(zed_imu_pose).get_orientation().get()[1], 3)
+oz = round(zed_imu.get_pose(zed_imu_pose).get_orientation().get()[2], 3)
+ow = round(zed_imu.get_pose(zed_imu_pose).get_orientation().get()[3], 3)
+print("IMU Orientation: Ox: {0}, Oy: {1}, Oz {2}, Ow: {3}\n".format(ox, oy, oz, ow))
+# Get IMU acceleration
+acceleration = [0,0,0]
+zed_imu.get_linear_acceleration(acceleration)
+ax = round(acceleration[0], 3)
+ay = round(acceleration[1], 3)
+az = round(acceleration[2], 3)
+print("IMU Acceleration: Ax: {0}, Ay: {1}, Az {2}\n".format(ax, ay, az))
+
+
+
+https://github.com/stereolabs/zed-examples/blob/master/spatial%20mapping/basic/python/spatial_mapping.py

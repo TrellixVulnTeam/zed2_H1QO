@@ -286,9 +286,16 @@ def main():
     cams.runtime_list = []
     # Set configuration parameters
 
-    init = sl.InitParameters(camera_resolution=sl.RESOLUTION.HD2K,
-                             coordinate_units=sl.UNIT.METER,
-                             # coordinate_units=sl.UNIT.MILLIMETER,#■
+    '''
+    https://www.stereolabs.com/docs/positional-tracking/using-tracking/
+    Positional tracking uses image and depth information to estimate the position of the camera in 3D space. 
+    To improve tracking results, use high FPS video modes such as HD720 and WVGA.
+    '''
+    init = sl.InitParameters(
+        camera_resolution=sl.RESOLUTION.HD720,#HD720
+        # camera_resolution=sl.RESOLUTION.HD2K,#HD720
+                             # coordinate_units=sl.UNIT.METER,
+                             coordinate_units=sl.UNIT.MILLIMETER,#精度アップのため
                              depth_mode=sl.DEPTH_MODE.PERFORMANCE,
                              coordinate_system=sl.COORDINATE_SYSTEM.RIGHT_HANDED_Y_UP)
 
