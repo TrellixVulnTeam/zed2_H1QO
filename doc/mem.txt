@@ -83,39 +83,20 @@ ssh user1@192.168.11.11
 作業内容はslam方法での点群マージの調査を続きます。
 
 
-お疲れ様です。1月12日　テレワーク終了します。
-本日作業内容について、slamの方法で点群マージの調査しました。
+お疲れ様です。1月13日　テレワーク終了します。
+本日作業内容について、渡部絢さん指示により、新しい点群マージ作業を実施。
 詳細内容は下記ファイルを参照してください。
 NICT AI\99.受け渡し\依頼履歴参照資料\于の日報.txt。
 
-01/12(于）
+01/13(于）
 本日作業について、下記通りです。
-作業目的：positional-trackingの資料を参照して、点群マージのtransform matrixを取得したいです。
-技術ポイント
-①positional-tracking
-②oritation、positionデータ取得
-③imuデータ検証
-④データ取り方と注意点
-  資料【zed2カメラ姿勢データ取得について_20210106.xlsx】を参照してください。
+本日作業内容について、渡部絢さん指示により、新しい点群マージ作業を実施。
+オブジェクト検出とセグメンテーション方法で動体検知実施しています。
+完成してから、結果を共有します。
 
-下記資料を参照して、カメラの姿勢matrixを使って、点群マージの試験を実施します。
-https://www.stereolabs.com/docs/positional-tracking/
-https://www.stereolabs.com/docs/positional-tracking/coordinate-frames/
-上記資料を参照して、データの取り方を考えて、
-データ取るプログラムを作成しました。
-連絡事項：
-　ubuntuの環境が崩れたので、データ取る試験の実施ができなかったので、
-よければ、そちら側データ取るについて、ご協力をお願いしたいです。
-①データ取り方：NICT AI\99.受け渡し\20210106\fromYUのファイル【zed2カメラ姿勢データ取得について_20210106.xlsx】
-　　を参照してください。
-②参照資料
-https://www.stereolabs.com/docs/positional-tracking/
-https://www.stereolabs.com/docs/positional-tracking/coordinate-frames/
-③データ取るプログラム：
-NICT AI\99.受け渡し\20210112\fromYU\zed2_multiple_cams_0112.py
-※プログラムのテストが不純分ですが、エラーがあるかもしれない、そちらが修正が難しい場合、
-ご連絡ください。
 
+
+＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾＾
 
 資料みる論理上上記方法で、transform matrix取得可能です。
 課題
@@ -350,5 +331,7 @@ az = round(acceleration[2], 3)
 print("IMU Acceleration: Ax: {0}, Ay: {1}, Az {2}\n".format(ax, ay, az))
 
 
-
+conda install -c open3d-admin open3d==0.10
+conda install -c conda-forge vectormath
+conda install -c conda-forge tensorflow-hub
 https://github.com/stereolabs/zed-examples/blob/master/spatial%20mapping/basic/python/spatial_mapping.py

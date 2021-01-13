@@ -22,39 +22,14 @@ import cv2,numpy as np,datetime
 import pandas as pd
 from PIL import Image
 from move_detection_v2 import detect_frame
-import os,itertools,struct
+import os,itertools
 from skimage.measure import compare_ssim
-# from zed2pcl import zed_depthfloat_to_abgr,make_pcd
+from zed2pcl import zed_depthfloat_to_abgr,make_pcd
 import open3d
 import copy as cp
 from object_detection_draw_v7 import load_model_obj,human_bbox_on_image_inferenced_result,get_img_bboxes,object_detection_from_npy_all_file,load_image_from_npy
 from segmentation_DeepLabV3_v5 import load_model_seg,load_image_small,run_inference
 #image1,image2,difference=compute_difference_cv2(image1,image2,color=[255, 0, 0])
-
-def zed_depthfloat_to_abgr(f):
-  """
-    ZED pcd data format:
-      ----------------------------------------------------------
-      https://www.stereolabs.com/docs/depth-sensing/using-depth/
-      ----------------------------------------------------------
-      The point cloud stores its data on 4 channels using 32-bit
-      float for each channel.
-      The last float is used to store color information, where
-      R, G, B, and alpha channels (4 x 8-bit) are concatenated
-      into a single 32-bit float.
-  """
-  # https://stackoverflow.com/questions/23624212/how-to-convert-a-float-into-hex/38879403
-  if f == 0.:
-    return [0,0,0,0]
-  else:
-    h = hex(struct.unpack('<I', struct.pack('<f', f))[0])
-    return [eval('0x'+a+b) for a, b in zip(h[::2], h[1::2]) if a+b != '0x']
-
-def make_pcd(points, colors):
-  pcd = open3d.geometry.PointCloud()
-  pcd.points = open3d.utility.Vector3dVector(points)
-  pcd.colors = open3d.utility.Vector3dVector(colors)
-  return pcd
 def compute_difference_cv2(image1,image2,color=[0, 0, 255]):
     # compute difference
     #print(image1.shape,image2.shape)
@@ -508,12 +483,7 @@ class moving_object_merge:
         disimg = cp.deepcopy(image)
         mask_img = np.zeros(image.shape)
         img_objs = get_img_bboxes(image, bboxes_ret)
-        max_area=None
-        max_area_size=0
-        max_area_bbox=None
-        mask_imgs=[]
         for imgbbox, bbox in zip(img_objs, bboxes_ret):
-            mask_img_single = np.zeros(image.shape)
             xmin, xmax, ymin, ymax = tuple(bbox)
             image_for_prediction, cropped_image, img_org = load_image_small(imgbbox, self.input_size, t="image")
             seg_map = run_inference(self.interpreter, self.input_details, image_for_prediction, cropped_image)
@@ -524,10 +494,6 @@ class moving_object_merge:
             seg_map_img = np.concatenate([seg_map_expand, seg_map_expand, seg_map_expand], axis=2)
             # disimg[ymin:ymax, xmin:xmax, :] = seg_map_img[0:w, 0:h, :]
             mask_img[ymin:ymax, xmin:xmax, :] = seg_map_img[0:w, 0:h, :]
-            mask_img_single[ymin:ymax, xmin:xmax, :] = seg_map_img[0:w, 0:h, :]
-            mask_imgs.append(mask_img_single)
-        self.bboxes_ret=bboxes_ret
-        self.mask_imgs=mask_imgs
         return mask_img,disimg
 
     def load_model_segmentation_object_detection(self):
@@ -603,37 +569,25 @@ def main_image_mask_ply_2021_0113(dt_id, fuchi_size, basepath, mob):
     # files_list = sorted(files_list)
     for j, cam in enumerate(camlst):
         # fn=f'{pathi}/{cam}/image.npy'
+        merge_id = 'mergeid_%04d' % (j)
         path_id = f'{pathi}/{cam}/'
         fn_img_moving = f'{path_id}image.npy'
         fn_img_average = f'{patho}/image_average_{cam}_s.npy'
         fn_pcd = f'{path_id}/pcd.npy'
         fd_ply = os.path.normpath(path_id).replace(os.path.normpath(pathi), os.path.normpath(path_ply))
-        fn_bboxes= f'{fd_ply}/bboxes.npy'
+        fn_ply = f'{fd_ply}/pcd_mask_{merge_id}.ply'
         os.makedirs(fd_ply, exist_ok=True)
         ply, img_msk, img = mob.get_moving_object_ply_by_mask(fn_img_moving, fn_img_average, fn_pcd)
-        np.save(fn_bboxes,mob.bboxes_ret)
-        for k,msk_img in enumerate(mob.mask_imgs):
-            merge_id = 'mergeid_%04d' % (k)
-            fn_image_npy = f'{fd_ply}/moving_detection_mask_{merge_id}.npy'
-            np.save(fn_image_npy, msk_img[:, :, 0])
-            fn_ply_k = f'{fd_ply}/pcd_mask_{merge_id}.ply'
-            ply_k=mob.get_pcd_by_mask(fn_pcd,msk_img)
-            open3d.io.write_point_cloud(fn_ply_k, ply_k)
-            fn_image_msk = f'{fd_ply}/moving_detection_mask_{merge_id}.png'
-            msk_img = msk_img * 255
-            cv2.imwrite(fn_image_msk, msk_img)
-
-        image_diff_fp = f'{fd_ply}/moving_detection_mask.npy'
+        open3d.io.write_point_cloud(fn_ply, ply)
+        print(j, fn_ply)
+        image_diff_fp = f'{fd_ply}/moving_detection_mask_{merge_id}.npy'
         np.save(image_diff_fp, img_msk[:, :, 0])
 
-        fn_ply = f'{fd_ply}/pcd_mask.ply'
-        print(j, fn_ply)
-        open3d.io.write_point_cloud(fn_ply, ply)
-        image_diff_fp = f'{fd_ply}/moving_detection_mask.png'
+        image_diff_fp = f'{fd_ply}/moving_detection_mask_{merge_id}.png'
         img_msk = img_msk * 255
         cv2.imwrite(image_diff_fp, img_msk)
 
-        image_diff_fp = f'{fd_ply}/image_org.png'
+        image_diff_fp = f'{fd_ply}/image_org_{merge_id}.png'
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         cv2.imwrite(image_diff_fp, img_rgb)
 #from scipy.signal import medfilt2d as medianBlur
@@ -768,9 +722,9 @@ cam2 : 22115402
 '''
 if __name__ == "__main__":
     basepath='D:/02_AIPJ/004_ISB/20210113/20210113/data'
-    # basepath='/home/user1/yu_develop/20201202_shiyoko_6f'
-    #basepath='C:/00_work/05_src/data/20201202_shiyoko_6f' 
+    basepath='/home/user1/yu_develop/20201202_shiyoko_6f'
     basepath='/home/user1/yu_develop/20210113/data'
+    #basepath='C:/00_work/05_src/data/20201202_shiyoko_6f'
     
     path_category_index = 'dt/category_index.npy'
     mod_path_seg = 'dt/lite-model_deeplabv3-xception65-ade20k_1_default_2.tflite'

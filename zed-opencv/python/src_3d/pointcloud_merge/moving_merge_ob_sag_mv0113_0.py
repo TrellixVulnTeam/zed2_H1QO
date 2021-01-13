@@ -507,13 +507,12 @@ class moving_object_merge:
         bboxes_ret, image = human_bbox_on_image_inferenced_result(fnpath, self.detector, self.category_index, th=0.5)
         disimg = cp.deepcopy(image)
         mask_img = np.zeros(image.shape)
+        mask_img_max = np.zeros(image.shape)
         img_objs = get_img_bboxes(image, bboxes_ret)
         max_area=None
         max_area_size=0
         max_area_bbox=None
-        mask_imgs=[]
         for imgbbox, bbox in zip(img_objs, bboxes_ret):
-            mask_img_single = np.zeros(image.shape)
             xmin, xmax, ymin, ymax = tuple(bbox)
             image_for_prediction, cropped_image, img_org = load_image_small(imgbbox, self.input_size, t="image")
             seg_map = run_inference(self.interpreter, self.input_details, image_for_prediction, cropped_image)
@@ -524,10 +523,14 @@ class moving_object_merge:
             seg_map_img = np.concatenate([seg_map_expand, seg_map_expand, seg_map_expand], axis=2)
             # disimg[ymin:ymax, xmin:xmax, :] = seg_map_img[0:w, 0:h, :]
             mask_img[ymin:ymax, xmin:xmax, :] = seg_map_img[0:w, 0:h, :]
-            mask_img_single[ymin:ymax, xmin:xmax, :] = seg_map_img[0:w, 0:h, :]
-            mask_imgs.append(mask_img_single)
+            if w*h>max_area_size:
+                max_area_size=w*h
+                max_area_bbox=bbox
+                max_area=seg_map_img[0:w, 0:h, :]
+        xmin, xmax, ymin, ymax = tuple(max_area_bbox)
+        mask_img_max[ymin:ymax, xmin:xmax, :] = max_area
         self.bboxes_ret=bboxes_ret
-        self.mask_imgs=mask_imgs
+        self.mask_img_max=mask_img_max
         return mask_img,disimg
 
     def load_model_segmentation_object_detection(self):
@@ -603,37 +606,36 @@ def main_image_mask_ply_2021_0113(dt_id, fuchi_size, basepath, mob):
     # files_list = sorted(files_list)
     for j, cam in enumerate(camlst):
         # fn=f'{pathi}/{cam}/image.npy'
+        merge_id = 'mergeid_%04d' % (j)
         path_id = f'{pathi}/{cam}/'
         fn_img_moving = f'{path_id}image.npy'
         fn_img_average = f'{patho}/image_average_{cam}_s.npy'
         fn_pcd = f'{path_id}/pcd.npy'
         fd_ply = os.path.normpath(path_id).replace(os.path.normpath(pathi), os.path.normpath(path_ply))
+        fn_ply = f'{fd_ply}/pcd_mask_{merge_id}.ply'
+        fn_ply_max = f'{fd_ply}/pcd_mask_max_{merge_id}.ply'
         fn_bboxes= f'{fd_ply}/bboxes.npy'
         os.makedirs(fd_ply, exist_ok=True)
         ply, img_msk, img = mob.get_moving_object_ply_by_mask(fn_img_moving, fn_img_average, fn_pcd)
         np.save(fn_bboxes,mob.bboxes_ret)
-        for k,msk_img in enumerate(mob.mask_imgs):
-            merge_id = 'mergeid_%04d' % (k)
-            fn_image_npy = f'{fd_ply}/moving_detection_mask_{merge_id}.npy'
-            np.save(fn_image_npy, msk_img[:, :, 0])
-            fn_ply_k = f'{fd_ply}/pcd_mask_{merge_id}.ply'
-            ply_k=mob.get_pcd_by_mask(fn_pcd,msk_img)
-            open3d.io.write_point_cloud(fn_ply_k, ply_k)
-            fn_image_msk = f'{fd_ply}/moving_detection_mask_{merge_id}.png'
-            msk_img = msk_img * 255
-            cv2.imwrite(fn_image_msk, msk_img)
 
-        image_diff_fp = f'{fd_ply}/moving_detection_mask.npy'
+        ply_max=mob.get_pcd_by_mask(fn_pcd,mob.mask_img_max)
+        open3d.io.write_point_cloud(fn_ply_max, ply_max)
+        open3d.io.write_point_cloud(fn_ply, ply)
+        print(j, fn_ply)
+        image_diff_fp = f'{fd_ply}/moving_detection_mask_{merge_id}.npy'
         np.save(image_diff_fp, img_msk[:, :, 0])
 
-        fn_ply = f'{fd_ply}/pcd_mask.ply'
-        print(j, fn_ply)
-        open3d.io.write_point_cloud(fn_ply, ply)
-        image_diff_fp = f'{fd_ply}/moving_detection_mask.png'
+        image_diff_fp = f'{fd_ply}/moving_detection_mask_{merge_id}.png'
         img_msk = img_msk * 255
         cv2.imwrite(image_diff_fp, img_msk)
 
-        image_diff_fp = f'{fd_ply}/image_org.png'
+
+        image_diff_fp = f'{fd_ply}/moving_detection_mask_max_{merge_id}.png'
+        img_msk = mob.mask_img_max * 255
+        cv2.imwrite(image_diff_fp, img_msk)
+
+        image_diff_fp = f'{fd_ply}/image_org_{merge_id}.png'
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         cv2.imwrite(image_diff_fp, img_rgb)
 #from scipy.signal import medfilt2d as medianBlur
@@ -769,7 +771,7 @@ cam2 : 22115402
 if __name__ == "__main__":
     basepath='D:/02_AIPJ/004_ISB/20210113/20210113/data'
     # basepath='/home/user1/yu_develop/20201202_shiyoko_6f'
-    #basepath='C:/00_work/05_src/data/20201202_shiyoko_6f' 
+    #basepath='C:/00_work/05_src/data/20201202_shiyoko_6f'
     basepath='/home/user1/yu_develop/20210113/data'
     
     path_category_index = 'dt/category_index.npy'
