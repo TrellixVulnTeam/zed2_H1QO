@@ -22,14 +22,39 @@ import cv2,numpy as np,datetime
 import pandas as pd
 from PIL import Image
 from move_detection_v2 import detect_frame
-import os,itertools
+import os,itertools,struct
 from skimage.measure import compare_ssim
-from zed2pcl import zed_depthfloat_to_abgr,make_pcd
+# from zed2pcl import zed_depthfloat_to_abgr,make_pcd
 import open3d
 import copy as cp
 from object_detection_draw_v7 import load_model_obj,human_bbox_on_image_inferenced_result,get_img_bboxes,object_detection_from_npy_all_file,load_image_from_npy
 from segmentation_DeepLabV3_v5 import load_model_seg,load_image_small,run_inference
 #image1,image2,difference=compute_difference_cv2(image1,image2,color=[255, 0, 0])
+
+def zed_depthfloat_to_abgr(f):
+  """
+    ZED pcd data format:
+      ----------------------------------------------------------
+      https://www.stereolabs.com/docs/depth-sensing/using-depth/
+      ----------------------------------------------------------
+      The point cloud stores its data on 4 channels using 32-bit
+      float for each channel.
+      The last float is used to store color information, where
+      R, G, B, and alpha channels (4 x 8-bit) are concatenated
+      into a single 32-bit float.
+  """
+  # https://stackoverflow.com/questions/23624212/how-to-convert-a-float-into-hex/38879403
+  if f == 0.:
+    return [0,0,0,0]
+  else:
+    h = hex(struct.unpack('<I', struct.pack('<f', f))[0])
+    return [eval('0x'+a+b) for a, b in zip(h[::2], h[1::2]) if a+b != '0x']
+
+def make_pcd(points, colors):
+  pcd = open3d.geometry.PointCloud()
+  pcd.points = open3d.utility.Vector3dVector(points)
+  pcd.colors = open3d.utility.Vector3dVector(colors)
+  return pcd
 def compute_difference_cv2(image1,image2,color=[0, 0, 255]):
     # compute difference
     #print(image1.shape,image2.shape)
@@ -494,6 +519,7 @@ class moving_object_merge:
             seg_map_img = np.concatenate([seg_map_expand, seg_map_expand, seg_map_expand], axis=2)
             # disimg[ymin:ymax, xmin:xmax, :] = seg_map_img[0:w, 0:h, :]
             mask_img[ymin:ymax, xmin:xmax, :] = seg_map_img[0:w, 0:h, :]
+        self.bboxes_ret=bboxes_ret
         return mask_img,disimg
 
     def load_model_segmentation_object_detection(self):
@@ -576,8 +602,10 @@ def main_image_mask_ply_2021_0113(dt_id, fuchi_size, basepath, mob):
         fn_pcd = f'{path_id}/pcd.npy'
         fd_ply = os.path.normpath(path_id).replace(os.path.normpath(pathi), os.path.normpath(path_ply))
         fn_ply = f'{fd_ply}/pcd_mask_{merge_id}.ply'
+        fn_bboxes= f'{path_id}bboxes.npy'
         os.makedirs(fd_ply, exist_ok=True)
         ply, img_msk, img = mob.get_moving_object_ply_by_mask(fn_img_moving, fn_img_average, fn_pcd)
+        np.save(fn_bboxes,mob.bboxes_ret)
         open3d.io.write_point_cloud(fn_ply, ply)
         print(j, fn_ply)
         image_diff_fp = f'{fd_ply}/moving_detection_mask_{merge_id}.npy'
