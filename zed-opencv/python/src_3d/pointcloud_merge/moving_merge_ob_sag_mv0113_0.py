@@ -507,7 +507,11 @@ class moving_object_merge:
         bboxes_ret, image = human_bbox_on_image_inferenced_result(fnpath, self.detector, self.category_index, th=0.5)
         disimg = cp.deepcopy(image)
         mask_img = np.zeros(image.shape)
+        mask_img_max = np.zeros(image.shape)
         img_objs = get_img_bboxes(image, bboxes_ret)
+        max_area=None
+        max_area_size=0
+        max_area_bbox=None
         for imgbbox, bbox in zip(img_objs, bboxes_ret):
             xmin, xmax, ymin, ymax = tuple(bbox)
             image_for_prediction, cropped_image, img_org = load_image_small(imgbbox, self.input_size, t="image")
@@ -519,7 +523,14 @@ class moving_object_merge:
             seg_map_img = np.concatenate([seg_map_expand, seg_map_expand, seg_map_expand], axis=2)
             # disimg[ymin:ymax, xmin:xmax, :] = seg_map_img[0:w, 0:h, :]
             mask_img[ymin:ymax, xmin:xmax, :] = seg_map_img[0:w, 0:h, :]
+            if w*h>max_area_size:
+                max_area_size=w*h
+                max_area_bbox=bbox
+                max_area=seg_map_img[0:w, 0:h, :]
+        xmin, xmax, ymin, ymax = tuple(max_area_bbox)
+        mask_img_max[ymin:ymax, xmin:xmax, :] = max_area
         self.bboxes_ret=bboxes_ret
+        self.mask_img_max=mask_img_max
         return mask_img,disimg
 
     def load_model_segmentation_object_detection(self):
@@ -602,10 +613,14 @@ def main_image_mask_ply_2021_0113(dt_id, fuchi_size, basepath, mob):
         fn_pcd = f'{path_id}/pcd.npy'
         fd_ply = os.path.normpath(path_id).replace(os.path.normpath(pathi), os.path.normpath(path_ply))
         fn_ply = f'{fd_ply}/pcd_mask_{merge_id}.ply'
+        fn_ply_max = f'{fd_ply}/pcd_mask_max_{merge_id}.ply'
         fn_bboxes= f'{path_id}bboxes.npy'
         os.makedirs(fd_ply, exist_ok=True)
         ply, img_msk, img = mob.get_moving_object_ply_by_mask(fn_img_moving, fn_img_average, fn_pcd)
         np.save(fn_bboxes,mob.bboxes_ret)
+
+        ply_max=mob.get_pcd_by_mask(fn_pcd,mob.mask_img_max)
+        open3d.io.write_point_cloud(fn_ply_max, ply_max)
         open3d.io.write_point_cloud(fn_ply, ply)
         print(j, fn_ply)
         image_diff_fp = f'{fd_ply}/moving_detection_mask_{merge_id}.npy'
@@ -613,6 +628,11 @@ def main_image_mask_ply_2021_0113(dt_id, fuchi_size, basepath, mob):
 
         image_diff_fp = f'{fd_ply}/moving_detection_mask_{merge_id}.png'
         img_msk = img_msk * 255
+        cv2.imwrite(image_diff_fp, img_msk)
+
+
+        image_diff_fp = f'{fd_ply}/moving_detection_mask_max_{merge_id}.png'
+        img_msk = mob.mask_img_max * 255
         cv2.imwrite(image_diff_fp, img_msk)
 
         image_diff_fp = f'{fd_ply}/image_org_{merge_id}.png'
