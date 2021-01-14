@@ -1,0 +1,82 @@
+find . -name "*.png.npy" -type f -delete
+find . -name "image.npy" -type d -delete
+ubuntu 20.4 install quaternion
+pip3 install numpy-quaternion
+pip3 install opencv-contrib-python
+ln -s /home/user1/00_zed/zed2/zed-opencv/python/src_3d/202011161_sample/out/cam0 ./
+
+
+データ追加
+cam0
+/media/user1/Data/data/20201116/cam0/20201116133250_002843/image.npy,1
+/media/user1/Data/data/20201116/cam0/20201116133250_533785/image.npy,0
+.....
+/media/user1/Data/data/20201116/cam0/20201116133924_235962/image.npy,1
+/media/user1/Data/data/20201116/cam0/20201116133924_633651/image.npy,1
+
+
+cam1
+/media/user1/Data/data/20201116/cam1/20201116133249_570699/image.npy,1
+/media/user1/Data/data/20201116/cam1/20201116133249_835797/image.npy,0
+....
+/media/user1/Data/data/20201116/cam1/20201116133924_002065/image.npy,0
+/media/user1/Data/data/20201116/cam1/20201116133924_399808/image.npy,1
+
+
+cam2
+/media/user1/Data/data/20201116/cam2/20201116133249_912235/image.npy,1
+/media/user1/Data/data/20201116/cam2/20201116133250_309771/image.npy,0
+.....
+/media/user1/Data/data/20201116/cam2/20201116133923_750001/image.npy,0
+/media/user1/Data/data/20201116/cam2/20201116133924_147539/image.npy,1
+
+
+⑦作業
+ssimとopencv動体検知について、下記資料を参照してくだい。
+実装方法：背景の平均値画像と動体がある画像で計算
+格納場所：NICT AI\99.受け渡し\20201120\fromYU
+ソース：ssim_opencv_moving_detection_average_2.py
+実行結果：ssim_opencv_moving_detection_2.zipを参照してください。
+実行ソース：/home/user1/yu_develop/20201119/ssim_opencv_moving_detection_average_2.py
+①image_org_plus_ssim.png
+  元画像＋ssim方法での動体検知結果
+②ssim_moving_detection.png
+  ssim方法での動体検知結果
+③opencv_moving_detection.png
+  opencvでの動体検知結果
+問題点：cam2動体以外ノイズが大きくになります。
+例：cam2/20201116133254_627421
+
+
+
+
+https://stackoverflow.com/questions/56183201/detect-and-visualize-differences-between-two-images-with-opencv-python
+上記リンク実施結果、下記通りです、ご確認をお願いします。
+ソースコード格納先：
+/home/user1/yu_develop/20201119
+実行コマンド： python3 moving_detection_average_img_v5.py
+実行結果格納先：/home/user1/yu_develop/202011161_sample/out
+①cv2 diff方法の結果：cv2_*.png
+例：/home/user1/yu_develop/202011161_sample/out/cam0/20201116133243_637972/cv2_moving_detection_diff.png
+②compare_ssim方法の結果：ssim_*png
+例：/home/user1/yu_develop/202011161_sample/out/cam0/20201116133243_637972/ssim_moving_detection__diff_2.png
+
+  *_diff_2.pngは動体検知の最終の出力です。
+ざっくりみると、compare_ssim方法がよいと思います。
+
+問題点：多少ノイズpixelsがあります。
+
+
+
+ssimとopencv動体検知について、下記資料を参照してくだい。
+実装方法：背景の平均値画像と動体がある画像で計算
+格納場所：NICT AI\99.受け渡し\20201120\fromYU
+ソース：ssim_opencv_moving_detection_average.py
+実行結果：ssim_opencv_moving_detection.zipを参照してください。
+実行ソース：/home/user1/yu_develop/20201119/ssim_opencv_moving_detection_average.py
+①image_org_plus_ssim.png
+  元画像＋ssim方法での動体検知結果
+②ssim_moving_detection.png
+  ssim方法での動体検知結果
+③opencv_moving_detection.png
+  opencvでの動体検知結果
