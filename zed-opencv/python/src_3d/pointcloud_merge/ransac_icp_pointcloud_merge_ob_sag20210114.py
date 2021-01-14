@@ -240,8 +240,8 @@ def main_ransac_icp(id,pose):
     pcds = ri.load_pcds(files_list)
     size=10
     for pcd in pcds:
-        si = np.abs((pcd.get_max_bound() - pcd.get_min_bound())).max() / 20
-        if  size > si:
+        si = np.abs((pcd.get_max_bound() - pcd.get_min_bound())).max() / 40
+        if  size < si:
             size=si
     print("size:",size)
     pcdsn=[]
@@ -329,7 +329,6 @@ def main_merge_point_cloud():
     for dt_id in dt_ids :
         for i in range(2):
             main_ransac_icp(i,dt_id)
-ff
 
 if __name__ == "__main__":
     main_merge_point_cloud()
