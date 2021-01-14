@@ -5,6 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src_3d/test" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src_3d/pointcloud_merge" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src_3d/slam_research" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src_3d/object_detection_segmentation" isTestSource="false" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.7 (tf13)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
