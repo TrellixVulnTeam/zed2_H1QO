@@ -116,6 +116,7 @@ import numpy as np
 import math
 from easydict import EasyDict
 import copy as cp
+from ransac_icp_pointcloud_merge_ob_sag1202 import ransac_icp
 
 # import pcl
 #python -m pip install numpy-quaternion
@@ -260,10 +261,10 @@ def get_good_match(bf,desc1,desc2):
             good_matches.append(match)
     print("good_matches:",len(good_matches))
     return matches
-def computeKeyPointsAndMaches_akaze(rgb0,rgb1):
+def computeKeyPointsAndMaches_akaze(imgdic):
     # OBR 特徴量検出器を作成する。
-    img1 = cv2.cvtColor(rgb0, cv2.COLOR_BGR2GRAY)
-    img2 = cv2.cvtColor(rgb1, cv2.COLOR_BGR2GRAY)
+    img1 = cv2.cvtColor(imgdic.rgb0, cv2.COLOR_BGR2GRAY)
+    img2 = cv2.cvtColor(imgdic.rgb1, cv2.COLOR_BGR2GRAY)
 
     #https://greenhornprofessional.hatenablog.com/entry/2020/04/03/005128
     # AKAZE検出器の生成
@@ -281,12 +282,12 @@ def computeKeyPointsAndMaches_akaze(rgb0,rgb1):
 
     dst = cv2.drawMatches(img1, kp1, img2, kp2, good_matches, None)
     return kp1,kp2,good_matches,dst
-def computeKeyPointsAndMaches_orb(rgb0,rgb1):
+def computeKeyPointsAndMaches_orb(imgdic):
     # OBR 特徴量検出器を作成する。
     detector = cv2.ORB_create()
     # 特徴点を検出する。
-    kp1, desc1 = detector.detectAndCompute(rgb0, None)
-    kp2, desc2 = detector.detectAndCompute(rgb1, None)
+    kp1, desc1 = detector.detectAndCompute(imgdic.rgb0, None)
+    kp2, desc2 = detector.detectAndCompute(imgdic.rgb1, None)
 
     # マッチングを行う。
     bf = cv2.BFMatcher(cv2.NORM_HAMMING)
@@ -295,10 +296,10 @@ def computeKeyPointsAndMaches_orb(rgb0,rgb1):
     # bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
     # good_matches= get_good_match(bf,desc1, desc2)
     # マッチング結果を描画する。
-    dst = cv2.drawMatches(rgb0, kp1, rgb1, kp2, good_matches, None)
+    dst = cv2.drawMatches(imgdic.rgb0, kp1, imgdic.rgb1, kp2, good_matches, None)
     # cv2.imwrite("data/dst2.jpg",dst)
     return kp1,kp2,good_matches,dst
-def computeKeyPointsAndMaches_sift(rgb0,rgb1):
+def computeKeyPointsAndMaches_sift(imgdic):
     # OBR 特徴量検出器を作成する。
     # detector = cv2.ORB_create()
     #http://whitewell.sakura.ne.jp/OpenCV/py_tutorials/py_feature2d/py_matcher/py_matcher.html
@@ -307,8 +308,8 @@ def computeKeyPointsAndMaches_sift(rgb0,rgb1):
     detector = cv2.xfeatures2d.SIFT_create()
 
     # 特徴点を検出する。
-    kp1, desc1 = detector.detectAndCompute(rgb0, None)
-    kp2, desc2 = detector.detectAndCompute(rgb1, None)
+    kp1, desc1 = detector.detectAndCompute(imgdic.rgb0, None)
+    kp2, desc2 = detector.detectAndCompute(imgdic.rgb1, None)
 
 
     # FLANNのパラメータ
@@ -448,6 +449,35 @@ def get_good_matches_pts(goodMatches,kp1,kp2,imgdic,cams):
 
     _, rVec1, tVec1=cv2.solvePnP(pts_obj1, pts_img1, cameraMatrix1, distCoeffs=distCoeffs)
     _, rVec2, tVec2=cv2.solvePnP(pts_obj2, pts_img2, cameraMatrix2, distCoeffs=distCoeffs)
+    # _, rVec, tVec = cv2.solvePnP(pts_obj, pts_img, cameraMatrix, distCoeffs=None,
+    #                              flags=cv.SOLVEPNP_ITERATIVE, useExtrinsicGuess=False, rvec=rvec0, tvec=T0)
+    # _, rVec, tVec = cv2.solvePnP(pts_obj, pts_img, cameraMatrix, distCoeffs=distCoeffs)
+    #https://sites.google.com/site/lifeslash7830/home/hua-xiang-chu-li/opencvwoshittaposeestimation
+    # _, rVec, tVec ,inliers = cv2.solvePnPRansac(pts_obj, pts_img, cameraMatrix, distCoeffs=distCoeffs, flags=cv2.SOLVEPNP_P3P,
+    #     iterationsCount=1000)
+    # print("inliers:",len(inliers))
+
+    #https://github.com/IntelRealSense/librealsense/blob/master/wrappers/python/examples/box_dimensioner_multicam/calibration_kabsch.py
+    # rotation_matrix=cv2.Rodrigues(rVec)[0]
+    # query_T_w = np.eye(4)
+    # query_T_w[:3, :3] = rotation_matrix
+    # query_T_w[:3, 3] = tVec.flatten() #-rot.T.dot(tvec)
+    # pose_mat = np.linalg.inv(query_T_w)
+    #
+    # rot = np.transpose(rotation_matrix)
+    # tVec_n = - np.matmul(rot,  tVec.flatten())
+    # query_T_r = np.eye(4)
+    # query_T_r[:3, :3] =rot
+    # query_T_r[:3, 3] = tVec_n.flatten()
+    #
+    # rot, _ = cv2.Rodrigues(rVec)
+    # tvec = -rot.T.dot(tVec)
+    # query_2 = np.eye(4)
+    # query_2[:3, :3] = rotation_matrix.T
+    # query_2[:3, 3] = tvec.flatten()
+    # TT=generateTransMatrix(tVec,rVec)
+
+
     R1=cv2.Rodrigues(rVec1)[0]
     R2=cv2.Rodrigues(rVec2)[0]
     R_12 = R2 @ R1.T
@@ -457,7 +487,170 @@ def get_good_matches_pts(goodMatches,kp1,kp2,imgdic,cams):
     trans12 = np.eye(4)
     trans12[:3, :3] = R_12
     trans12[:3, 3] = t_12.flatten()
+    #https://answers.opencv.org/question/162932/create-a-stereo-projection-matrix-using-rvec-and-tvec/
+    def computeProjMat(camMat,rotVec,transVec):
+        rotMat=cv2.Rodrigues(rotVec)[0]
+        rotTransMat=cv2.hconcat(rotMat,transVec[0])
+        return camMat * rotTransMat
+    '''
+    cv::Mat computeProjMat(cv::Mat camMat, vector<cv::Mat> rotVec, vector<cv::Mat> transVec)
+    {
+    cv::Mat rotMat(3, 3, CV_64F), rotTransMat(3, 4, CV_64F); //Init.
+    //Convert rotation vector into rotation matrix 
+    cv::Rodrigues(rotVec[0], rotMat);
+    //Append translation vector to rotation matrix
+    cv::hconcat(rotMat, transVec[0], rotTransMat);
+    //Compute projection matrix by multiplying intrinsic parameter 
+    //matrix (A) with 3 x 4 rotation and translation pose matrix (RT).
+    //Formula: Projection Matrix = A * RT;
+    return (camMat * rotTransMat);
+    }
+    '''
     return trans12,pts_obj1,pts_obj2
+
+def get_pose_ransac_icp(pcds):
+    ri=ransac_icp()
+    sizes=[]
+    for pcd in pcds:
+        size =np.abs((pcd.get_max_bound() - pcd.get_min_bound())).max()
+        sizes.append(size)
+    size=np.max(sizes)*2
+    pcdsn=[]
+    for pcd in pcds:
+        pcdn=ri.add_color_normal(pcd,size)
+        pcdsn.append(pcdn)
+    pcd_aligned,translst = ri.align_pcds(pcdsn, size)
+    return translst
+def get_good_matches_pts_ply(pcd1,pcd2,goodMatches,kp1,kp2,imgdic,cams):
+    # zed_points1 = pcd1[:, :, :3]
+    zed_colors1 = pcd1[:, :, 3]
+    # zed_points2 = pcd2[:, :, :3]
+    zed_colors2 = pcd2[:, :, 3]
+    colors_obj1=[]
+    colors_obj2=[]
+    pts_obj1=[]
+    pts_obj2=[]
+    pts_img1=[]
+    pts_img2=[]
+    def make_obj(p,d,cam):
+        pt=[p[1],p[0],d]
+        pd= point2dTo3d(pt,cam)
+        return pd
+    for i, goodMatch in enumerate(goodMatches):
+        p1=np.array(kp1[goodMatch.queryIdx].pt,dtype=np.int)
+        p2=np.array(kp2[goodMatch.trainIdx].pt,dtype=np.int)
+        d1=imgdic.dpt0[p1[1],p1[0]]
+        d2=imgdic.dpt1[p2[1],p2[0]]
+        if d1 == 0 or d2 == 0 :
+            continue;
+        pts1=make_obj(p1, d1,cams[0])
+        pts2=make_obj(p2,d2,cams[1])
+        if np.isnan(np.mean(pts1))  or np.isnan(np.mean(pts2)) or np.isinf(np.mean(pts1)) or np.isinf(np.mean(pts2)):
+            continue
+        pts_obj1.append(pts1)
+        pts_obj2.append(pts2)
+        pts_img1.append(p1)
+        pts_img2.append(p2)
+
+        tmp = zed_depthfloat_to_abgr(zed_colors1[p1[1],p1[0]])
+        tmp = [tmp[3], tmp[2], tmp[1]]  # ABGR to RGB
+        tmp = np.array(tmp).astype(np.float64) / 255.  # for ply (color is double)
+        colors_obj1.append(tmp)
+
+        tmp = zed_depthfloat_to_abgr(zed_colors2[p2[1],p2[0]])
+        tmp = [tmp[3], tmp[2], tmp[1]]  # ABGR to RGB
+        tmp = np.array(tmp).astype(np.float64) / 255.  # for ply (color is double)
+        colors_obj2.append(tmp)
+    if len(pts_obj1)==0 or len(pts_img2)==0:
+        return -1
+    print(f"pts_obj1:{len(pts_obj1)},pts_obj2:{len(pts_obj2)}")
+    id=0
+    cameraMatrix1=[
+        [cams[id].fx,0,cams[id].cx],
+        [0,cams[id].fy,cams[id].cy],
+        [0,0,1]
+        ]
+    id=1
+    cameraMatrix2=[
+        [cams[id].fx,0,cams[id].cx],
+        [0,cams[id].fy,cams[id].cy],
+        [0,0,1]
+        ]
+    distCoeffs=[0, 0, 0, 0, 0]
+    pts_img1=np.array(pts_img1,dtype=np.float32)
+    pts_img2=np.array(pts_img2,dtype=np.float32)
+    pts_obj1 = np.array(pts_obj1, dtype=np.float32)
+    pts_obj2 = np.array(pts_obj2, dtype=np.float32)
+    cameraMatrix1 = np.array(cameraMatrix1, dtype=np.float64)
+    cameraMatrix2 = np.array(cameraMatrix2, dtype=np.float64)
+    distCoeffs = np.array(distCoeffs, dtype=np.float64)
+
+    _, rVec1, tVec1=cv2.solvePnP(pts_obj1, pts_img1, cameraMatrix1, distCoeffs=distCoeffs)
+    _, rVec2, tVec2=cv2.solvePnP(pts_obj2, pts_img2, cameraMatrix2, distCoeffs=distCoeffs)
+    # _, rVec, tVec = cv2.solvePnP(pts_obj, pts_img, cameraMatrix, distCoeffs=None,
+    #                              flags=cv.SOLVEPNP_ITERATIVE, useExtrinsicGuess=False, rvec=rvec0, tvec=T0)
+    # _, rVec, tVec = cv2.solvePnP(pts_obj, pts_img, cameraMatrix, distCoeffs=distCoeffs)
+    #https://sites.google.com/site/lifeslash7830/home/hua-xiang-chu-li/opencvwoshittaposeestimation
+    # _, rVec, tVec ,inliers = cv2.solvePnPRansac(pts_obj, pts_img, cameraMatrix, distCoeffs=distCoeffs, flags=cv2.SOLVEPNP_P3P,
+    #     iterationsCount=1000)
+    # print("inliers:",len(inliers))
+
+    #https://github.com/IntelRealSense/librealsense/blob/master/wrappers/python/examples/box_dimensioner_multicam/calibration_kabsch.py
+    # rotation_matrix=cv2.Rodrigues(rVec)[0]
+    # query_T_w = np.eye(4)
+    # query_T_w[:3, :3] = rotation_matrix
+    # query_T_w[:3, 3] = tVec.flatten() #-rot.T.dot(tvec)
+    # pose_mat = np.linalg.inv(query_T_w)
+    #
+    # rot = np.transpose(rotation_matrix)
+    # tVec_n = - np.matmul(rot,  tVec.flatten())
+    # query_T_r = np.eye(4)
+    # query_T_r[:3, :3] =rot
+    # query_T_r[:3, 3] = tVec_n.flatten()
+    #
+    # rot, _ = cv2.Rodrigues(rVec)
+    # tvec = -rot.T.dot(tVec)
+    # query_2 = np.eye(4)
+    # query_2[:3, :3] = rotation_matrix.T
+    # query_2[:3, 3] = tvec.flatten()
+    # TT=generateTransMatrix(tVec,rVec)
+
+
+    R1=cv2.Rodrigues(rVec1)[0]
+    R2=cv2.Rodrigues(rVec2)[0]
+    R_12 = R2 @ R1.T
+    # t_12= R2 @ (-R1.T @ tVec1) + tVec2
+    t_12= tVec2 - R_12@tVec1
+    # trans12=generateTransMatrixRt(t_12,R_12)
+    trans12 = np.eye(4)
+    trans12[:3, :3] = R_12
+    trans12[:3, 3] = t_12.flatten()
+    #https://answers.opencv.org/question/162932/create-a-stereo-projection-matrix-using-rvec-and-tvec/
+    def computeProjMat(camMat,rotVec,transVec):
+        rotMat=cv2.Rodrigues(rotVec)[0]
+        rotTransMat=cv2.hconcat(rotMat,transVec[0])
+        return camMat * rotTransMat
+    '''
+    cv::Mat computeProjMat(cv::Mat camMat, vector<cv::Mat> rotVec, vector<cv::Mat> transVec)
+    {
+    cv::Mat rotMat(3, 3, CV_64F), rotTransMat(3, 4, CV_64F); //Init.
+    //Convert rotation vector into rotation matrix 
+    cv::Rodrigues(rotVec[0], rotMat);
+    //Append translation vector to rotation matrix
+    cv::hconcat(rotMat, transVec[0], rotTransMat);
+    //Compute projection matrix by multiplying intrinsic parameter 
+    //matrix (A) with 3 x 4 rotation and translation pose matrix (RT).
+    //Formula: Projection Matrix = A * RT;
+    return (camMat * rotTransMat);
+    }
+    '''
+
+
+    pcd1=make_pcd(pts_obj1,colors_obj1)
+    pcd2=make_pcd(pts_obj2,colors_obj2)
+    pcds=[pcd1,pcd2]
+    translst=get_pose_ransac_icp(pcds)
+    return trans12,translst,pts_obj1,pts_obj2
 
 
 class compute_pose_points:
@@ -525,11 +718,13 @@ class compute_pose_points:
         points1s=np.array(points1s)
         points2s=np.array(points2s)
 
+        # points1s = points1s - np.mean(points1s, axis=0)
+        # points2s = points2s - np.mean(points2s, axis=0)
         estPose = np.eye(4, 4)
         obj=points1s.T
         obs=points2s.T
         var_min=0.0004
-        for i in range(1000):
+        for i in range(20):
             estPoseOld=cp.deepcopy(estPose)
             w_obj  = self.warp3d(obj, estPose)
             query, target = self.findCrsp(w_obj , obs)
@@ -549,35 +744,70 @@ def move_2_center(cloud):
 
 
 def main_func(keymatchfun,ext,cams,imgdic):
+    bpd='D:/02_AIPJ/004_ISB/20210113/pointcloud/d5_c/'
+    bpd_org='D:/02_AIPJ/004_ISB/20210113/data/d5_c/'
     pc=compute_pose_points()
-    kp1,kp2,goodMatches,img_dst=keymatchfun(imgdic.rgb0,imgdic.rgb1)
-    pose_mat,pts_obj1,pts_obj2=get_good_matches_pts(goodMatches,kp1,kp2,imgdic,cams)
+    kp1,kp2,goodMatches,img_dst=keymatchfun(imgdic)
+
+    fn_pcd1=f'{bpd_org}cam0/pcd.npy'
+    fn_pcd2=f'{bpd_org}cam1/pcd.npy'
+    pcd1=np.load(fn_pcd1)
+    pcd2=np.load(fn_pcd2)
+    pose_mat,trans_m,pts_obj1,pts_obj2=get_good_matches_pts_ply(pcd1, pcd2, goodMatches, kp1, kp2, imgdic, cams)
+    # pose_mat,pts_obj1,pts_obj2=get_good_matches_pts(goodMatches,kp1,kp2,imgdic,cams)
+    # ply1=open3d.io.read_point_cloud(f'{bpd}cam0/pcd_mask.ply')
+    # ply2=open3d.io.read_point_cloud(f'{bpd}cam1/pcd_mask.ply')
+    # voxel_down_pcd1 = ply1.voxel_down_sample(voxel_size=30)
+    # voxel_down_pcd2 = ply2.voxel_down_sample(voxel_size=30)
+    # pts_obj1=np.array(voxel_down_pcd1.points)
+    # pts_obj2=np.array(voxel_down_pcd2.points)
+
+    # pts_obj1_t=pc.warp3d(np.array(pts_obj1).T, pose_mat)
     estPose=pc.keypoint_tm(pts_obj1,pts_obj2)
 
-    cloud0=open3d.io.read_point_cloud(f'{bpd}cam0/pcd_mask.ply')
-    cloud1=open3d.io.read_point_cloud(f'{bpd}cam1/pcd_mask.ply')
+    # cloud0=image2PointCloud(imgdic.rgb0,imgdic.dpt0,cams[0])
+    # cloud1=image2PointCloud(imgdic.rgb1,imgdic.dpt1,cams[1])
+    # open3d.io.write_point_cloud(f'{bp}pcd_org1.ply', cloud0)
+    # open3d.io.write_point_cloud(f'{bp}pcd_org2.ply', cloud1)
+    cloud0=open3d.io.read_point_cloud(f'{bp}pcd_org1_bk.ply')
+    cloud1=open3d.io.read_point_cloud(f'{bp}pcd_org2_bk.ply')
+    # cloud0=move_2_center(cloud0)
+    # cloud1=move_2_center(cloud1)
     cloud0_t=cp.deepcopy(cloud0)
     cloud0_gm=cloud0_t.transform(pose_mat)
+    open3d.io.write_point_cloud(f'{bp}{ext}_pcd_trans_1_t.ply', cloud0_gm)
+
+    cloud1_t=cp.deepcopy(cloud1)
+    cloud1_gm=cloud1_t.transform(trans_m[1])
+    open3d.io.write_point_cloud(f'{bp}{ext}_pcd_trans_2_t2.ply', cloud1_gm)
 
     cv2.imwrite(f"{bp}{ext}_img_dst.jpg",img_dst)
-
+    # open3d.io.write_point_cloud(f'{bp}pcd_org1.ply', cloud0)
+    # points1=np.array(cloud0.points)
+    # colors1=np.array(cloud0.colors)
+    # points1t = pc.warp3d(points1.T, estPose)
+    #
+    # cloud0t2 = make_pcd(points1t.T, colors1)
+    # cloud1t=cloud1.transform(pose_mat)
     cloud0_t=cp.deepcopy(cloud0)
     cloud0t2=cloud0_t.transform(estPose)
-    open3d.io.write_point_cloud(f'{bpd}{ext}_pcd_trans_0_solvePnP.ply', cloud0_gm)
-    open3d.io.write_point_cloud(f'{bpd}{ext}_pcd_trans_0_calcPose3D.ply', cloud0t2)
-
+    open3d.io.write_point_cloud(f'{bp}{ext}_pcd_trans_1_t2.ply', cloud0t2)
+    # # open3d.io.write_point_cloud('pcd_trans_2t.ply', cloud1t)
     pcd=merge_points_cloud([cloud0_gm,cloud1])
-    open3d.io.write_point_cloud(f'{bpd}{ext}_pcd_merge_solvePnP.ply', pcd)
-
-
-    pcd=merge_points_cloud([cloud0t2,cloud1])
-    open3d.io.write_point_cloud(f'{bpd}{ext}_pcd_merge_calcPose3D.ply', pcd)
-
+    open3d.io.write_point_cloud(f'{bp}{ext}_pcd_merge_t.ply', pcd)
 keyfuns=[
     [computeKeyPointsAndMaches_akaze,"akaze"],
     # [computeKeyPointsAndMaches_orb,"orb"],
     [computeKeyPointsAndMaches_sift,"sift"],
          ]
+
+'''
+
+      "fx": 1055.26,
+      "fy": 1054.92,
+      "cx": 962.91,
+      "cy": 567.182,
+'''
 
 cam_zed2_22378008_left_hd1080 = EasyDict({})
 cam_zed2_22378008_left_hd1080.fx=1055.26
@@ -585,6 +815,7 @@ cam_zed2_22378008_left_hd1080.fy=1054.92
 cam_zed2_22378008_left_hd1080.cx=962.91
 cam_zed2_22378008_left_hd1080.cy=567.182
 cam_zed2_22378008_left_hd1080.depthScale=1000.0
+
 
 '''
 
@@ -616,15 +847,12 @@ cam_zed2_22115402_left_hd1080.cy=560.099
 cam_zed2_22115402_left_hd1080.depthScale=1000.0
 
 bp='D:/02_AIPJ/004_ISB/20210113/data/d5_c/'
-bpd = 'D:/02_AIPJ/004_ISB/20210113/pointcloud/d5_c/'
 
 imgdic = EasyDict({})
 imgdic.rgb0=cv2.imread(f"{bp}/cam0/image.png")
 imgdic.rgb1=cv2.imread(f"{bp}/cam1/image.png")
-imgdic.rgb2=cv2.imread(f"{bp}/cam2/image.png")
 imgdic.dpt0=np.load(f"{bp}/cam0/depth.npy")
 imgdic.dpt1=np.load(f"{bp}/cam1/depth.npy")
-imgdic.dpt2=np.load(f"{bp}/cam2/depth.npy")
 '''
 cam_zed2_21888201_left_hd1080:cam0
 cam_zed2_22378008_left_hd1080:cam1

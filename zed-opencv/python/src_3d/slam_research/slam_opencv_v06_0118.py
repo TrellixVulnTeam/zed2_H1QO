@@ -615,8 +615,8 @@ cam_zed2_22115402_left_hd1080.cx=909.73
 cam_zed2_22115402_left_hd1080.cy=560.099
 cam_zed2_22115402_left_hd1080.depthScale=1000.0
 
-bp='D:/02_AIPJ/004_ISB/20210113/data/d5_c/'
-bpd = 'D:/02_AIPJ/004_ISB/20210113/pointcloud/d5_c/'
+bp='data/d5_c/'
+bpd = 'pointcloud/d5_c/'
 
 imgdic = EasyDict({})
 imgdic.rgb0=cv2.imread(f"{bp}/cam0/image.png")
