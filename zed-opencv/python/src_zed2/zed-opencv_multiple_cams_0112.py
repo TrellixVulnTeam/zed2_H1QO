@@ -311,9 +311,8 @@ def main():
     cams.name_list = []
     cams.py_translation_list = []
     cams.py_orientation_list = []
-    cams.transform_list = []
     cams.runtime_list = []
-    # Set configuration parameters
+    # Set configuration parameters    cams.transform_list = []
 
     '''
     https://www.stereolabs.com/docs/positional-tracking/using-tracking/
