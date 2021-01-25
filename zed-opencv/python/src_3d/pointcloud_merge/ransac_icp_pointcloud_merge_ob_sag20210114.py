@@ -2,11 +2,9 @@
 import numpy as np
 import open3d as py3d
 import cv2
-import os, itertools
-import datetime
+import os
 #pip install open3d==0.10.0.1
 # import pcl
-import matplotlib.pyplot as plt
 class ransac_icp:
     def __init__(self):
         self.RANSAC = py3d.registration.registration_ransac_based_on_feature_matching
