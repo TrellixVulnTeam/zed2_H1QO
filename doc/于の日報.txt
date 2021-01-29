@@ -1,0 +1,767 @@
+01/28(于）
+本日作業について、下記通りです。
+指示により、成果物のまとめ
+纏めした資料格納先：\NICT AI\99.受け渡し\20210128\fromYU
+説明資料について、作成しています、完成したら、共有します。
+
+
+
+01/26(于）
+本日作業について、下記通りです。
+深度学習slamで、取得した特徴ポイントに対して、
+ポイントクラウドにより、点群の変換マトリックスを計算の技術を調査しました。
+参照資料：
+https://github.com/neka-nat/probreg
+
+纏めした資料格納先：\NICT AI\99.受け渡し\20210126\fromYU
+DLでslam実現検討_特徴抽出_変換マトリックス.xlsx
+実行結果格納先：NICT AI\99.受け渡し\20210126\fromYU\contextdesc_probreg実行結果
+ソースコード：slam_geodesc0126.ipynb
+
+01/25(于）
+本日作業について、下記通りです。
+深度学習slamで、取得した特徴ポイントに対して、
+ポイントクラウドにより、点群の変換マトリックスを計算の技術を調査しました。
+参照資料：
+https://github.com/neka-nat/probreg
+
+纏めした資料格納先：\NICT AI\99.受け渡し\20210125\fromYU
+DLでslam実現検討_特徴抽出_変換マトリックス.xlsx
+シート【probreg】
+明日以後特徴点群取得してから、tansform matrixの計算のところ、
+【probreg】など技術で試します。
+
+
+01/22(于）
+本日作業について、下記通りです。
+slamでtransform matrix計算するときに、深層学習に関する技術実施します。
+訓練済みモデルもありますので、続いて、その方法で、実装します。
+参照資料：
+https://github.com/lzx551402/contextdesc
+実行結果格納先：\NICT AI\99.受け渡し\20210122\fromYU
+ソースコード：slam_geodesc0122.ipynb
+入力ファイル：points_merge_contextdesc\imgs
+depth_cam0.npy
+depth_cam1.npy
+depth_cam2.npy
+pcd_mask_cam0.ply
+pcd_mask_cam1.ply
+rgb_cam0.png
+rgb_cam1.png
+rgb_cam2.png
+出力ファイル：
+・マージ済み点群
+aug_pcd_merge_solvePnP.ply
+base_pcd_merge_solvePnP.ply
+sift_pcd_merge_solvePnP.ply
+・transform済み点群
+sift_pcd_trans_0_solvePnP.ply
+aug_pcd_trans_0_solvePnP.ply
+base_pcd_trans_0_solvePnP.ply
+結論：
+aug_pcd_trans_0_solvePnP.plyのほうか、よいみたいです。
+改善点：
+特徴点群取得してから、tansform matrixの計算のところ、
+来週から、tansform matrixの計算について、深度学習も含めって、色んなやり方を試す予定です。
+
+
+
+
+
+01/21(于）
+本日作業について、下記通りです。
+slamでtransform matrix計算するときに、深層学習に関する技術実施します。
+訓練済みモデルもありますので、続いて、その方法で、実装します。
+参照資料：
+https://github.com/lzx551402/contextdesc
+実装について、今日は7割ぐらい完成しました。明日完成予定です。
+完成したら、ソースと結果を展開します。
+
+01/20(于）
+本日作業について、下記通りです。
+slamでtransform matrix計算するときに、深層学習に関する技術実施します。
+訓練済みモデルもありますので、続いて、その方法で、実装します。
+参照資料：
+https://github.com/lzx551402/contextdesc
+モデル実施と評価、下記資料を参照してください。
+実行結果格納先：\NICT AI\99.受け渡し\20210120\fromYU
+DLでslam実現検討_contextdescで特徴を抽出.xlsx
+
+
+01/19(于）
+本日作業について、下記通りです。
+slamでtransform matrix計算するときに、キーポイント取得について、opencv代わり、深層学習に関する技術探しできました。
+訓練済みモデルもありますので、続いて、その方法で、実装します。
+参照資料：
+https://github.com/lzx551402/contextdesc
+
+
+01/18(于）
+本日作業内容について、新しい点群slamでマージ作業を実施しました。
+実行結果格納先：\NICT AI\99.受け渡し\20210118\fromYU
+20210118.zip
+現在試験のため、一つパターン【5c1】のcam0とcam1だけを実施しました。
+良い結果を取れ次第、三つカメラおよび他のパターンを実施します。
+
+01/15(于）
+本日作業内容について、新しい点群slamでマージ作業を実施しています。
+作業中ですが、完成したら展開します。
+
+
+
+01/14(于）
+本日作業について、下記通りです。
+本日作業内容について、渡部絢さん指示により、新しい点群マージ作業を実施。
+①オブジェクト検出とセグメンテーション方法で動体検知実施しています。
+②検出された動体の点群マージを実施します。
+格納先：NICT AI\99.受け渡し\20210114\fromYU
+ソース：ransac_icp_pointcloud_merge_ob_sag20210114.py
+マージ結果：pointcloud_merge.zip
+
+
+01/13(于）
+本日作業について、下記通りです。
+本日作業内容について、渡部絢さん指示により、新しい点群マージ作業を実施。
+オブジェクト検出とセグメンテーション方法で動体検知実施しています。
+完成してから、結果を共有します。
+
+
+01/12(于）
+本日作業について、下記通りです。
+作業目的：positional-trackingの資料を参照して、点群マージのtransform matrixを取得したいです。
+技術ポイント
+①positional-tracking
+②oritation、positionデータ取得
+③imuデータ検証
+④データ取り方と注意点
+  資料【zed2カメラ姿勢データ取得について_20210106.xlsx】を参照してください。
+
+下記資料を参照して、カメラの姿勢matrixを使って、点群マージの試験を実施します。
+https://www.stereolabs.com/docs/positional-tracking/
+https://www.stereolabs.com/docs/positional-tracking/coordinate-frames/
+上記資料を参照して、データの取り方を考えて、
+データ取るプログラムを作成しました。
+連絡事項：
+　ubuntuの環境が崩れたので、データ取る試験の実施ができなかったので、
+よければ、そちら側データ取るについて、ご協力をお願いしたいです。
+①データ取り方：NICT AI\99.受け渡し\20210106\fromYUのファイル【zed2カメラ姿勢データ取得について_20210106.xlsx】
+　　を参照してください。
+②参照資料
+https://www.stereolabs.com/docs/positional-tracking/
+https://www.stereolabs.com/docs/positional-tracking/coordinate-frames/
+③データ取るプログラム：
+NICT AI\99.受け渡し\20210112\fromYU\zed2_multiple_cams_0112.py
+※プログラムのテストが不純分ですが、エラーがあるかもしれない、そちらが修正が難しい場合、
+ご連絡ください。
+
+
+01/08(于）
+本日作業について、下記通りです。
+zed2環境崩れたので、ubuntu環境構築しました。
+
+
+01/07(于）
+本日作業について、下記通りです。
+
+NICT AI\99.受け渡し\20210106\fromYUの
+【zed2カメラ姿勢データ取得について_20210106.xlsx】シート【03_データ取り方試験】のデータをとるためにて、
+プログラムの作成しています。
+8割完成。明日以後テスト実施して、展開します。
+
+01/06(于）
+本日作業について、下記通りです。
+下記資料を参照して、カメラの姿勢matrixを使って、点群マージの試験を実施します。
+https://www.stereolabs.com/docs/positional-tracking/
+https://www.stereolabs.com/docs/positional-tracking/coordinate-frames/
+上記資料を参照して、データの取り方を考えて、資料を作成しました。
+格納先：NICT AI\99.受け渡し\20210106\fromYU
+【zed2カメラ姿勢データ取得について_20210106.xlsx】を参照してください。
+シート【03_データ取り方試験】を参照してください。
+データ取るプログラムの作成を着手しました。
+------------------------------------------------
+
+
+01/05(于）
+本日作業について、下記通りです。
+①zed2カメラの姿勢取得について、下記資料を勉強しました。
+その資料を参照して、カメラの姿勢matrixを使って、点群マージの試験を実施します。
+https://www.stereolabs.com/docs/positional-tracking/
+https://www.stereolabs.com/docs/positional-tracking/coordinate-frames/
+②上記資料を纏め
+格納先：NICT AI\99.受け渡し\20210105\fromYU
+整理したものは資料【zed2カメラ姿勢データ取得について_20210105.xlsx】を参照してください。
+明日以後は関連作業下記の通りです。
+・データの取り方を考えて、資料を作成
+・データ取るプログラムを作成
+・データ取ると点群マージの試験を実施
+
+
+12/25(于）
+本日作業について、下記通りです。
+slam実施のため、カメラ姿勢計算の方法について、下記の方法を検証しました。
+【akaze、orb、sift】三つ特徴量検出方法で実施しました。
+詳細は下記通りです。
+①特徴量検出SIFTの方法
+http://labs.eecs.tottori-u.ac.jp/sd/Member/oyamada/OpenCV/html/py_tutorials/py_feature2d/py_matcher/py_matcher.html
+②特徴量検出AKAZEの方法
+https://greenhornprofessional.hatenablog.com/entry/2020/04/03/005128
+③姿勢を推測
+　solvePnPRansacの方法
+https://sites.google.com/site/lifeslash7830/home/hua-xiang-chu-li/opencvwoshittaposeestimation
+
+格納先：NICT AI\99.受け渡し\20201225\fromYU
+ソース：slam_opencv_v3.py
+出力先：NICT AI\99.受け渡し\20201225\fromYU\data_v4  
+    jpgファイル：特徴量検出ファイル
+    *pcd_merge_t.plyマージした点群です。
+
+
+12/24(于）
+本日作業について、下記通りです。
+slam実施のため、カメラ姿勢計算の方法について、調査しました。
+詳細は下記通りです。
+①特徴量検出SIFTの方法
+http://labs.eecs.tottori-u.ac.jp/sd/Member/oyamada/OpenCV/html/py_tutorials/py_feature2d/py_matcher/py_matcher.html
+②特徴量検出AKAZEの方法
+https://greenhornprofessional.hatenablog.com/entry/2020/04/03/005128
+③姿勢を推測
+　solvePnPRansacの方法
+https://sites.google.com/site/lifeslash7830/home/hua-xiang-chu-li/opencvwoshittaposeestimation
+明日以後検証します。
+
+
+
+
+12/23(于）
+本日作業について、下記通りです。
+slam実施のため、カメラ姿勢計算の方法
+slamでの点群マージについて、
+ORB 特徴量検出とsolvePnPからのワールド座標でのカメラ位置計算して、カメラの姿勢を推測につて、
+①data_v2データで、特徴量検出を実施
+格納先：NICT AI\99.受け渡し\20201223\fromYU\data_v2
+ソース：slam_opencv_v2.py
+データ：data_v2
+実施結果：
+特徴量検出ファイル：data_v2\
+test_drawMatches-0_2.jpg
+depthデータがないですが、カメラの姿勢の実施しなかった。
+明日以後新しいデータ取りましたら、続き実施します。
+②カメラのデータ取る資料とプログラムを作成
+完成したら、展開します。
+
+
+
+12/22(于）
+本日作業について、下記通りです。
+slam実施のため、カメラ姿勢計算の方法
+slamでの点群マージについて、
+ORB 特徴量検出とsolvePnPからのワールド座標でのカメラ位置計算して、カメラの姿勢を推測につて、
+データ【20201202_shiyoko_6f\image\d2_a30_h1.5】の検証を実施しました。
+格納先：NICT AI\99.受け渡し\20201222\fromYU
+ソース：slam_opencv_v1.py
+データ：data\d2_a30_h1.5
+実施結果：
+特徴量検出ファイル：data\
+dsp_0000.jpg
+dsp_0001.jpg
+dsp_0002.jpg
+dsp_0003.jpg
+上記特徴量写真を見ると、【ORB 特徴量検出】技術は動体に対して、効果がないと判断できます。
+
+
+12/21(于）
+本日作業について、下記通りです。
+slam実施のため、カメラ姿勢計算の方法
+OBR 特徴量検出とsolvePnPからのワールド座標でのカメラ位置計算して、カメラの姿勢を推測
+\NICT AI\99.受け渡し\20201221\fromYU\
+ソース：slam_opencv_v0.py
+データ：data\
+実行結果：pcd_merge.ply
+中間結果：pcd_org1.ply、pcd_org2.ply、pcd_trans_1.ply
+参照資料：
+https://pystyle.info/opencv-feature-matching/
+https://www.366service.com/jp/qa/ed8c0298cc30a02ee80c3d9ecef63a69
+https://programtalk.com/python-examples/cv2.solvePnP/
+
+12/17(于）
+本日作業について、下記通りです。
+slam実施のため、カメラ姿勢計算の方法
+slamでの点群マージについて、
+OBR 特徴量検出とsolvePnPからのワールド座標でのカメラ位置計算して、カメラの姿勢を推測につて、
+pythonプログラムを作成しています。関連資料下記通りです。
+※既存python OSSがないですが、実装とテストの時間がかかます。
+https://blog.csdn.net/Wayne__Yang/article/details/72598628
+https://docs.opencv.org/3.4/d7/d66/tutorial_feature_detection.html
+https://cvg.ethz.ch/teaching/cvl/2012/Tutorial-OpenCV.pdf
+
+12/16(于）
+本日作業について、下記通りです。
+①slam実施のため、カメラ姿勢計算の方法
+slamでの点群マージについて、FeatureDetector とsolvePnPRansacカメラの姿勢を推測につて、気になって、
+https://blog.csdn.net/Wayne__Yang/article/details/72598628
+https://docs.opencv.org/3.4/d7/d66/tutorial_feature_detection.html
+https://cvg.ethz.ch/teaching/cvl/2012/Tutorial-OpenCV.pdf
+明日関連資料の調査を続きます。
+②slam他の資料
+https://github.com/leocvml/SLAM_Practice
+③C++環境構築について、opencv のインストールについて、
+各パッケージのいろいろ不整合がありますが、時間がかかりますので、
+一旦保留します。
+
+
+12/15(于）
+slam方法での点群マージを調査します。
+①pose方法で、点群マージを試す
+https://blog.csdn.net/inghoG/article/details/108597111
+zed2のposeのデータがよくないですが。効果が見えませんでした。
+ソース：\NICT AI\99.受け渡し\20201215\fromYU
+②他の方法を調査
+例：
+https://github.com/mp3guy/ElasticFusion
+現状：slam関連OSSはpython少ないですが、
+C++ことが多いです。
+明日から、C++環境を構築して、試す予定です。
+
+
+
+
+
+12/14（于）
+slam方法での点群マージを調査します。
+①pythonでslam関連実装方法調査
+https://blog.csdn.net/inghoG/article/details/108597111
+②zed2カメラ情報取得調査 pose ,transform計算方法を調査
+https://www.stereolabs.com/docs/positional-tracking/using-tracking/
+
+12/11（于）
+点群マージ・ノイズ除去の調査
+案１（multiway_registration）と案２（ransac FPFH icp）を使って、全てデータ点群マージを実施しました。
+実行結果は下記通りです。
+
+格納先：NICT AI\99.受け渡し\20201211\fromYU\
+ソース：point_clounds_merge_multiway_registration_v3.py
+　　　　point_clounds_remove_noise_v3.py
+　　　　ransac_icp_pointcloud_merge_ob_sag_v3.py
+マージした点群：multiway_registrationの方法でマージした点群
+格納先：NICT AI\99.受け渡し\20201211\fromYU\point_cloud_merge
+①案１の実行結果：multiway_registration(point_clounds_merge_multiway_registration_v3.py)
+mwr_pcd_aligned_mergeid_0000.ply
+mwr_pcd_aligned_mergeid_0001.ply
+mwr_pcd_aligned_mergeid_0002.ply
+mwr_pcd_aligned_mergeid_0003.ply
+①案2の実行結果：ransac FPFH icp(ransac_icp_pointcloud_merge_ob_sag_v3.py)
+ransac_pcd_aligned_mergeid_0000.ply
+ransac_pcd_aligned_mergeid_0001.ply
+ransac_pcd_aligned_mergeid_0002.ply
+ransac_pcd_aligned_mergeid_0003.ply
+
+
+12/10（于）
+点群マージ・ノイズ除去の調査
+格納先：NICT AI\99.受け渡し\20201210\fromYU\
+ソース：point_clounds_remove_noise_v2.py
+　　　　point_clounds_merge_multiway_registration_v2.py
+マージした点群：multiway_registrationの方法でマージした点群
+格納先：NICT AI\99.受け渡し\20201210\fromYU\d2_a15_h1.5
+格納先：NICT AI\99.受け渡し\20201210\fromYU\d2_a30_h1.5
+格納先：NICT AI\99.受け渡し\20201210\fromYU\d2_a45_h1.5
+mwr_pcd_aligned_mergeid_0000.ply
+mwr_pcd_aligned_mergeid_0001.ply
+mwr_pcd_aligned_mergeid_0002.ply
+mwr_pcd_aligned_mergeid_0003.ply
+
+12/09（于）
+点群マージ・ノイズ除去の調査
+格納先：NICT AI\99.受け渡し\20201209\fromYU\
+ソース：point_clounds_remove_noise_v1.py
+　　　　point_clounds_merge_multiway_registration_v1.py
+マージした点群：multiway_registrationの方法でマージした点群
+格納先：NICT AI\99.受け渡し\20201208\fromYU\d2_a30_h1.5
+格納先：NICT AI\99.受け渡し\20201208\fromYU\d2_a15_h1.5
+mwr_remove_noise_pcd_aligned_mergeid_0000.ply
+mwr_remove_noise_pcd_aligned_mergeid_0001.ply
+mwr_remove_noise_pcd_aligned_mergeid_0002.ply
+mwr_remove_noise_pcd_aligned_mergeid_0003.ply
+ノイズ除去について、良い結果を取れました。
+
+
+
+
+12/08（于）
+①点群のマージについて、一部マージ順番がずれがありますので、訂正した。
+マージした点群格納先：
+NICT AI\99.受け渡し\20201208\fromYU
+
+②点群マージの調査
+格納先：NICT AI\99.受け渡し\20201208\fromYU\点群マージ調査
+ソース：point_clounds_merge_v1.py
+　　　　point_clounds_remove_noise_v1.py
+マージした点群：multiway_registrationの方法でマージした点群
+格納先：NICT AI\99.受け渡し\20201208\fromYU\点群マージ調査\d2_a30_h1.5
+mwr_pcd_aligned_mergeid_0000.ply
+mwr_pcd_aligned_mergeid_0001.ply
+mwr_pcd_aligned_mergeid_0002.ply
+mwr_pcd_aligned_mergeid_0003.ply
+
+
+12/07(于）
+■下記残り三つパターンを実施しました。
+d4_a15_h1.5
+d4_a30_h1.5
+d4_a45_h1.5
+格納先：\NICT AI\99.受け渡し\20201203\fromYU
+■点群のマージとノイズ除去に関する調査
+①https://github.com/aipiano/guided-filter-point-cloud-denoise/blob/master/main.py
+②http://whitewell.sakura.ne.jp/Open3D/PointCloudOutlierRemoval.html
+マスクノイズ除去
+①img_mask = cv2.medianBlur(img, ksize)
+②check_fuchi(img, y, x,size)
+明日①検証②パラメータ調査など実施します。
+
+
+
+12/04(于)
+今日下記六つパターンを実施しました。
+ d2_a15_h1.5
+ d2_a30_h1.5
+ d2_a45_h1.5
+ d4_a15_h1
+ d4_a30_h1
+ d4_a45_h1
+ 
+格納先：\NICT AI\99.受け渡し\20201203\fromYU
+フォルダ説明
+①merge_org：マージ後点群
+②pointcloud：マージ前点群
+③merge_fuchi10：マージ後点群
+④pointcloud_fuchi10：マージ前点群
+
+
+12/03(于）
+１２月０２日の取りました画像に対して、点群の出力とマージ作業実施。
+問題点：昨日取りましたデータは平均背景画像がないので、動体検知はssimなど技術は使えないと思います。
+代わりに、動体検知について、object detection+segmentationの方法で対応予定です。
+
+今日下記三つパターンを実施しました。
+ ①d2_a15_h1、
+ ②d2_a30_h1、
+ ③d2_a45_h1
+格納先：\NICT AI\99.受け渡し\20201203\fromYU
+フォルダ説明
+①merge_org：マージ後点群
+②pointcloud：マージ前点群
+③merge_fuchi10：マージ後点群
+④pointcloud_fuchi10：マージ前点群
+
+12/02(于）
+撮影の準備と撮影の実施
+
+12/01(于）
+①fuchi　size 12 と15の実行結果： \NICT AI\99.受け渡し\20201201\fromYU
+　ソース：fuchi_test.py
+②size10で縁ノイズ除去。 回転並進だけ実施。
+　NICT AI\99.受け渡し\20201201\fromYU\fuchi_test_size10
+ソース：convert_coordinate_3cams.py
+③チーム内部の打ち合わせ
+④3d reconstruction資料学習（伊藤さんより提供）
+　https://docs.opencv.org/master/da/de9/tutorial_py_epipolar_geometry.html
+　http://www.vision.is.tohoku.ac.jp/files/2614/9481/1105/4-multiview_geometry.pdf
+
+11/30(于）
+①ノイズ除外検討と実施
+   渡辺さん支援により、メソッド【def check_fuchi(img, y, x):】を実装
+   成果物格納先：NICT AI\99.受け渡し\20201130\fromYU
+   ソース：fuchi_test.py
+   実行結果：【fuchi_ply_size02、fuchi_ply_size05、fuchi_ply_size10】
+②点群のマージ試験を試す
+   点群マージソース：   \NICT AI\99.受け渡し\20201126\fromYU\ransac_icp_pointcloud_merge_v2.py
+   
+   実行結果：NICT AI\99.受け渡し\20201130\fromYU\pointclouds_mergeのサーブフォルダ
+   【fuchi_ply_size02、fuchi_ply_size05、fuchi_ply_size10】
+      マージした点群
+      pcd_aligned_mergeid_0000.ply
+      pcd_aligned_mergeid_0001.ply
+      cam0変換した点群:pcd_aligned_mergeid_0000_cam0.ply,pcd_aligned_mergeid_0001_cam0.ply
+      cam1変換した点群:pcd_aligned_mergeid_0000_cam1.ply,pcd_aligned_mergeid_0001_cam1.ply
+      cam2変換した点群:pcd_aligned_mergeid_0000_cam2.ply,pcd_aligned_mergeid_0001_cam2.ply
+
+11/26(于）
+あ、⑧ノイズ除外処理調査と対応、ソースクラス化
+  ソース：NICT AI\99.受け渡し\20201126\fromYU\moving_merge_02.py
+  実行結果：NICT AI\99.受け渡し\20201126\fromYU\moving_merge_02_出力サンプル
+い、⑨ノイズ除外処理調査と対応
+  ソースコード：ransac_icp_pointcloud_merge_02.py
+  実行結果：NICT AI\99.受け渡し\20201126\fromYU\ransac_icp_pointcloud_merge_02_出力サンプル
+      マージした点群
+      pcd_aligned_mergeid_0000.ply
+      pcd_aligned_mergeid_0047.ply
+      変換元点群格納先：NICT AI\99.受け渡し\20201126\fromYU\ransac_icp_pointcloud_merge_02_出力サンプル
+      cam0変換した点群:pcd_aligned_mergeid_0000_cam0.ply,pcd_aligned_mergeid_0047_cam0.ply
+      cam1変換した点群:pcd_aligned_mergeid_0000_cam1.ply,pcd_aligned_mergeid_0047_cam1.ply
+      cam2変換した点群:pcd_aligned_mergeid_0000_cam2.ply,pcd_aligned_mergeid_0047_cam2.ply
+い、⓾課題を洗い出す。下記資料を参照してください。
+     NICT AI\99.受け渡し\依頼履歴参照資料\NEW_#0003_統合処理_人・動体点群の抽出処理の実装・検証.xlsx
+
+
+11/25(于）
+あ、⑧の対応
+  ⇒実装完成
+  ソース：NICT AI\99.受け渡し\20201125\fromYU\moving_merge_01.py
+  実行結果：NICT AI\99.受け渡し\20201125\fromYU\moving_merge_01_出力サンプル
+い、⑨の対応
+  下記の案について、実装完成
+  参照資料：https://qiita.com/tttamaki/items/648422860869bbccc72d
+  ソースコード：ransac_icp_pointcloud_merge_01.py
+  実行結果：NICT AI\99.受け渡し\20201125\fromYU\ransac_icp_pointcloud_merge_01_出力サンプル
+      マージした点群
+      pcd_aligned_mergeid_0000.ply
+      pcd_aligned_mergeid_0047.ply
+      変換元点群格納先：NICT AI\99.受け渡し\20201125\fromYU\ransac_icp_pointcloud_merge_01_出力サンプル
+      cam0変換した点群:pcd_aligned_mergeid_0000_cam0.ply,pcd_aligned_mergeid_0047_cam0.ply
+      cam1変換した点群:pcd_aligned_mergeid_0000_cam1.ply,pcd_aligned_mergeid_0047_cam1.ply
+      cam2変換した点群:pcd_aligned_mergeid_0000_cam2.ply,pcd_aligned_mergeid_0047_cam2.ply
+う、案と課題の整理について、
+  NICT AI\99.受け渡し\依頼履歴参照資料\NEW_#0003_統合処理_人・動体点群の抽出処理の実装・検証.xlsx
+え、課題改善について、調査中
+
+
+11/24（于）
+⑧の対応
+  ⇒実装完成　テスト中
+  ソース：NICT AI\99.受け渡し\20201124\fromYU
+  実行結果（一部）：NICT AI\99.受け渡し\20201124\fromYU\cam0
+⑨の対応
+  下記の案について、着手
+  https://qiita.com/tttamaki/items/648422860869bbccc72d
+
+
+
+11/20(于）
+⑧着手して、作業中：object detectionで、humanを切り出しまで、テスト中
+ ソースコード：NICT AI\99.受け渡し\20201120\fromYU/human_image_crop_v2.py
+⑧⑨番問題点予想
+動体点群マージするときに、一つ写真にて、複数動体がある場合、下記課題があります。
+●動体を切り出し実装するときに、下記問題点が考えられました。相談してから、続きます。
+問題点:一つずつ動体の点群をマージするか、点群全体マージするか？
+一つずつ動体の点群をマージする場合、点群マージするときに、動体が複数の場合、点群マージが複雑になりそうです。
+        
+
+⑦番作業実施
+ssimとopencv動体検知について、下記資料を参照してくだい。
+実装方法：背景の平均値画像と動体がある画像で計算
+格納場所：NICT AI\99.受け渡し\20201120\fromYU
+ソース：ssim_opencv_moving_detection_average_2.py
+実行結果：ssim_opencv_moving_detection_2.zipを参照してください。
+実行ソース：/home/user1/yu_develop/20201119/ssim_opencv_moving_detection_average_2.py
+①image_org_plus_ssim.png
+  元画像＋ssim方法での動体検知結果
+②ssim_moving_detection.png
+  ssim方法での動体検知結果
+③opencv_moving_detection.png
+  opencvでの動体検知結果
+問題点：cam2：ノイズが大きくになります。
+例：cam2/20201116133254_627421
+⑥番作業実施
+ssimとopencv動体検知について、下記資料を参照してくだい。
+実装方法：背景の平均値画像と動体がある画像で計算
+格納場所：NICT AI\99.受け渡し\20201120\fromYU
+ソース：ssim_opencv_moving_detection_average.py
+実行結果：ssim_opencv_moving_detection.zipを参照してください。
+実行ソース：/home/user1/yu_develop/20201119/ssim_opencv_moving_detection_average.py
+①image_org_plus_ssim.png
+  元画像＋ssim方法での動体検知結果
+②ssim_moving_detection.png
+  ssim方法での動体検知結果
+③opencv_moving_detection.png
+  opencvでの動体検知結果
+  
+
+11/19（于）
+⑧着手して、作業中：object detectionで、humanを切り出しまで、テスト中
+ ソースコード：/home/user1/yu_develop/20201119/human_image_crop.py
+■出力説明
+①動体検知
+関数move_detection_v2.pyのdetect_frame
+参照資料：https://qiita.com/K_M95/items/4eed79a7da6b3dafa96d
+cv2_moving_detection.png
+ssim_moving_detection.png
+②
+参照資料：https://stackoverflow.com/questions/56183201/detect-and-visualize-differences-between-two-images-with-opencv-python
+案の１：cv2.subtract,cv2.thresholdなど関数を使って、画像差分方法。
+ソースコードファイル：
+　moving_detection_average_img_v5.py
+　def get_human_lst_each_diff_fun(path,patho,func=None,ext='cv2'):
+　def compute_difference_cv2(image1,image2,color=[0, 0, 255]):
+出力ファイル：
+cv2_moving_detection_diff.png：元画像＋マスク
+cv2_moving_detection_diff_2.png：マスク
+案の②：skimage.measure.compare_ssimなど関数を使って、類似度計算して、画像差分方法。
+ソースコードファイル：
+　moving_detection_average_img_v5.py
+　def get_human_lst_each_diff_fun(path,patho,func=None,ext='cv2'):
+　def compute_difference_ssim(before,after,color=[0, 0, 255]):
+出力ファイル：
+    ssim_moving_detection_diff.png：元画像＋マスク
+    ssim_moving_detection_diff_2.png：マスク
+■案の実施
+https://stackoverflow.com/questions/56183201/detect-and-visualize-differences-between-two-images-with-opencv-python
+上記リンク実施結果、下記通りです、ご確認をお願いします。
+ソースコード格納先：
+/home/user1/yu_develop/20201119
+実行コマンド： python3 moving_detection_average_img_v5.py
+実行結果格納先：/home/user1/yu_develop/202011161_sample/out
+①cv2 diff方法の結果：cv2_*.png
+②compare_ssim方法の結果：ssim_*png
+  *_diff_2.pngは動体検知の最終の出力です。
+ざっくりみると、compare_ssim方法がよいと思います。
+
+問題点：多少ノイズpixelsがあります。
+
+11/18(于）
+②は完成 
+④⑤について、伊藤さんのを実施
+成果物格納先：
+ソース：/home/user1/yu_develop/20201118
+実行結果は：/home/user1/yu_develop/202011161_sample/out/
+■説明
+moving_detection_average_img_v2.py：伊藤さんの案により、
+                                    実行結果：moving_detection_diff.png
+moving_detection_average_img_v3.py：伊藤さんの案+画像をgray処理、
+                                    実行結果：moving_detection_diff_gray.png
+moving_detection_average_img_v4.py：伊藤さんの案+画像をgray処理＋cv2.GaussianBlur平滑化処理、
+                                    実行結果：moving_detection_diff_gaus_gray.png
+
+■他の案について、
+あ、画像に対して、opencvで平滑化、およびノイズ除外処理を追加の方法
+⇒出力結果による判断して、ノイズはある程度減少できました、改善がありますが、完璧に解決できない。
+
+い、https://stackoverflow.com/questions/56183201/detect-and-visualize-differences-between-two-images-with-opencv-python
+skimage.measure の compare_ssimを活用
+
+
+****************************************************
+①（完）segmentationの適用を実施
+②　11/16のデータ(cam1.zip, cam2.zip)を于さんubuntuに移動（gdriveからダウンロード）
+③　（完）11/16のデータのデータで人のいない時間帯を特定
+④　人のいない時間帯の画像群の平均画像を取得（cam0で実施）
+⑤　（人のいる画像の画素値－⑤の平均画像の画素値）を計算。どうなるかを見て、動体検出として利用できるかを考える。
+⑥　11/16のデータを使って「平均画像と異なる領域以外を白くする」ロジックを実装してください。（ObjectDetectionを行っているはずなので、人のいる・いないは比較的簡単に分かるはずです。）
+　　なお、平均画像の画素値を引いても、背景の色が残るかもしれません。この残差はノイズですので、ノイズを消す工夫をしてみてください
+　　（しかし、工夫は最低限で構いません。「工夫しているだけで半日経ってしまった」はNGです）
+⑦　④ー⑥で利用したデータの時刻で、cam1, cam2があるはずなので、④ー⑥のロジックをcam1, cam2のデータにも適用してください。
+⑧　そうすると、３視点の画像について「平均画像から異なる領域」以外が消えるはずなので、「背景と異なる領域」だけ、plyで3d化させてみてください。
+⑨　11/16の測定パラメータに合わせて回転・並進を実施し、⑧のデータを合成してみてください。
+⑩　⑨までで出来上がったデータを見て、問題点を洗い出してください。（調査は不要です。）
+11/17(于）
+
+実施ソース：\NICT AI\99.受け渡し\20201117\fromYU
+①と②の実行結果は192.168.11.57のフォルダ【/media/user1/Data/data/Data_out_20201116/】に格納しました。
+問題点：「平均画像から異なる領域」以外が消えることできない。
+例：20201116133241_000460
+   moving_detection.png ：【https://qiita.com/K_M95/items/4eed79a7da6b3dafa96d】の方法での出力。
+   moving_detection_diff.png：平均画像の画素値を引くの方法での出力。
+
+伊藤さん依頼作業
+++++++++++++++++++++++++++++++++++++++++++++++++++++;;
+①　昨日の④⑤の作業の継続です。11/16のデータを使って「平均画像と異なる領域以外を白くする」ロジックを実装してください。（ObjectDetectionを行っているはずなので、人のいる・いないは比較的簡単に分かるはずです。）
+　　なお、平均画像の画素値を引いても、背景の色が残るかもしれません。この残差はノイズですので、ノイズを消す工夫をしてみてください（しかし、工夫は最低限で構いません。「工夫しているだけで半日経ってしまった」はNGです）
+
+②　①で使った時刻で、３つのカメラ視点データがあるはずなので、①のロジックを３つのカメラ視点データに適用してください。
+③　そうすると、３視点の画像について「平均画像から異なる領域」以外が消えるはずなので、「背景と異なる領域」だけ、plyで3d化させてみてください。
+④　11/16の測定パラメータに合わせて回転・並進を実施し、③のデータを合成してみてください。
+
+⑤　④までで出来上がったデータを見て、問題点を洗い出してください。（調査は不要です。）
+
+よろしくお願いします。
+
+なお、項目番号ごとにデータ・ソースが出来上がるはずなので、都度gdriveにuploadするか、それらファイルを格納しているUbuntuのディレクトリをこちらのチャットに記載してください。
+
+
+
+
+11/16(于)
+作業内容は下記通りです。
+①segmentationの適用を実施
+⇒ソース　NICT AI\99.受け渡し\20201116\fromYU\DeepLabV3_segmentation_v2.py
+  実施結果：192.168.11.57/20201111_shinyoko_f4f
+②今日のデータを于さんubuntuに移動
+⇒渡辺さんより、移動済み
+③今日のデータで人のいない時間帯を特定
+⇒segmentation精度は悪くで、代わりにobject detectionを使います。
+④人のいない時間帯の画像群の平均画像を取得
+⇒実装完成
+⑤（人のいる画像の画素値－⑤の平均画像の画素値）を計算。どうなるかを見て、動体検出として利用できるかを考え
+⇒実装完成
+④と⑤のソース格納先：NICT AI\99.受け渡し\20201116\fromYU\moving_detection_average_img.py
+　　　　実行中：格納先：/media/user1/Data/data/Data_out_20201116/
+
+
+11/12(于)
+　動体検知最新ソース：NICT AI\99.受け渡し\20201112\fromYU\move_detection_v2.py
+　物体検知最新ソース：NICT AI\99.受け渡し\20201112\fromYU\object_detection_draw_v4.py
+　segmentation動作ソース：NICT AI\99.受け渡し\20201112\DeepLabV3_segmentation.py
+ 作業内容：
+　①　測定班の取得したデータを于さん席のubuntuにコピー。
+　　　/home/user1/20201111_shinyoko_4fに保存。
+　⇒完成
+　②　取得データに動体検知を実行する。
+　　　（実行結果は各ディレクトリのmoving_detection.pngに保存）
+　⇒完成
+　③　取得データに人検知を実行する。
+　　　（実行結果は各ディレクトリのhuman_detection.pngに保存。
+　　　　人検出があれば、human_detection.npyに保存。）
+　⇒実行中
+　④　まずは動体検知について、問題点があるかどうかを評価する。
+　　　問題点をメモにまとめ、伊藤とレビュー
+　　　動体検知の問題点：
+    　①画面にノイズポイントがあります。
+    　  予想原因：ライトは不安定
+    　  moving_detection_s0.png
+    　  moving_detection_s1.png
+    　②動体の移動が速い場合、２重画像が見えます。
+    　 moving_detection_s0.png
+      サンプル結果の格納先：
+        NICT AI\99.受け渡し\20201112\fromYU
+
+
+11/11 (于)
+  ①object detection 対応
+    完成
+    格納先：\NICT AI\99.受け渡し\20201111\fromYU
+    最新版：object_detection_draw_v3.py
+  ②技術検討
+  ③moving detectionの対応    
+    完成
+    格納先：\NICT AI\99.受け渡し\20201111\fromYU
+    最新版：move_detection_v1.py
+  
+11/10 (于)
+  ①multiprocess カメラ動作実装と確認
+    完成
+    格納先：\NICT AI\99.受け渡し\20201110\fromYU
+    最新版：measure_zed2cams_v2.py
+  ②技術検討
+  ③multiprocessの指摘対応
+  ④zed_cam⇒menuのglobal削除の対応
+  ⑤object detection対応
+    対応中
+     
+11/9 (于)
+  (#0002 の続き。)
+  ①create_base_data.pyとconvert_coordinate.py流す
+  ②上記出力結果について、技術検討
+   成果物：NICT AI\99.受け渡し\20201109\fromYU
+  ③multiprocess カメラ動作実装と確認
+     multiprocessに、menuパラメータの渡すについて、調査中
+   
+11/6 (于)
+  (#0002 の続き。)
+  * ③-1～3の調整
+
+    => ベクトルの設定が不適切なので継続してトライ。
+  作業内容
+  ①点群回転トライ
+    成果ものは下記フォルダに格納しました。
+    NICT AI\99.受け渡し\20201106\fromYU
+  ②回転のルールを調査
+    調査中
